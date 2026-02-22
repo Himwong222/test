@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>客戶列表 - 茶言觀色·客戶流失風險評估器</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6b8f24",
+                        "background-light": "#f7f8f6",
+                        "background-dark": "#1b1f13",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans", "Noto Sans TC", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Work Sans', 'Noto Sans TC', sans-serif; }
+        .risk-high { background-color: #fef2f2; border-color: #fecaca; color: #dc2626; }
+        .risk-medium { background-color: #fffbeb; border-color: #fde68a; color: #d97706; }
+        .risk-low { background-color: #f0fdf4; border-color: #bbf7d0; color: #059669; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
+    <header class="flex items-center justify-between border-b border-primary/10 bg-white dark:bg-background-dark px-6 py-3 sticky top-0">
+        <div class="flex items-center gap-4">
+            <div class="size-8 text-primary">
+                <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+                </svg>
+            </div>
+            <h2 class="text-lg font-bold">茶言觀色·客戶流失風險評估器</h2>
+        </div>
+        <div class="flex items-center gap-4">
+            <button id="theme-toggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
+                <span id="theme-icon" class="material-symbols-outlined">dark_mode</span>
+            </button>
+            <nav class="hidden md:flex items-center gap-6">
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="index.html">主頁</a>
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="churn_risk_assessment_dashboard_1/code.html">雙語儀表板</a>
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="churn_risk_assessment_dashboard_3/code.html">中文儀表板</a>
+                <a class="text-primary border-b-2 border-primary pb-1" href="customer_list.html">客戶列表</a>
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="reports.html">數據報表</a>
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="settings.html">系統設定</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="p-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-8">
+                <h1 class="text-3xl font-black mb-2">客戶列表</h1>
+                <p class="text-slate-600 dark:text-slate-400">管理已評估的客戶資料，查看風險等級，並進行批量操作。</p>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-6 mb-6">
+                <div class="flex flex-col md:flex-row justify-between gap-4">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="relative">
+                            <input type="text" id="search-input" placeholder="搜尋客戶..." class="pl-10 pr-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 w-full md:w-64">
+                            <span class="material-symbols-outlined absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">search</span>
+                        </div>
+                        <select id="filter-risk" class="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700">
+                            <option value="all">所有風險等級</option>
+                            <option value="high">高風險</option>
+                            <option value="medium">中風險</option>
+                            <option value="low">低風險</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-3">
+                        <button id="add-customer-btn" class="px-4 py-2 bg-primary text-white rounded-lg font-semibold flex items-center gap-2">
+                            <span class="material-symbols-outlined">person_add</span>
+                            新增客戶
+                        </button>
+                        <button id="export-csv-btn" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-semibold flex items-center gap-2">
+                            <span class="material-symbols-outlined">download</span>
+                            匯出 CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">總客戶數</p>
+                            <p id="total-customers" class="text-3xl font-bold">0</p>
+                        </div>
+                        <div class="size-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                            <span class="material-symbols-outlined">group</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">高風險客戶</p>
+                            <p id="high-risk-count" class="text-3xl font-bold text-rose-600">0</p>
+                        </div>
+                        <div class="size-12 rounded-lg bg-rose-100 dark:bg-rose-900/20 text-rose-600 flex items-center justify-center">
+                            <span class="material-symbols-outlined">warning</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">平均流失機率</p>
+                            <p id="avg-probability" class="text-3xl font-bold text-amber-600">0%</p>
+                        </div>
+                        <div class="size-12 rounded-lg bg-amber-100 dark:bg-amber-900/20 text-amber-600 flex items-center justify-center">
+                            <span class="material-symbols-outlined">trending_up</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">最後更新</p>
+                            <p id="last-updated" class="text-lg font-bold">-</p>
+                        </div>
+                        <div class="size-12 rounded-lg bg-emerald-100 dark:bg-emerald-900/20 text-emerald-600 flex items-center justify-center">
+                            <span class="material-symbols-outlined">update</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-slate-50 dark:bg-slate-800">
+                            <tr>
+                                <th class="py-4 px-6 text-left">客戶名稱</th>
+                                <th class="py-4 px-6 text-left">年齡</th>
+                                <th class="py-4 px-6 text-left">每月造訪</th>
+                                <th class="py-4 px-6 text-left">未造訪天數</th>
+                                <th class="py-4 px-6 text-left">滿意度</th>
+                                <th class="py-4 px-6 text-left">流失機率</th>
+                                <th class="py-4 px-6 text-left">風險等級</th>
+                                <th class="py-4 px-6 text-left">評估日期</th>
+                                <th class="py-4 px-6 text-left">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customer-table-body">
+                            <tr id="empty-state">
+                                <td colspan="9" class="py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <div class="size-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-4">
+                                            <span class="material-symbols-outlined text-[32px]">group</span>
+                                        </div>
+                                        <h3 class="text-lg font-bold mb-2">尚無客戶資料</h3>
+                                        <p class="text-slate-500 dark:text-slate-400 mb-6">點擊「新增客戶」按鈕開始建立客戶資料。</p>
+                                        <button id="add-first-customer" class="px-6 py-3 bg-primary text-white rounded-lg font-semibold flex items-center gap-2">
+                                            <span class="material-symbols-outlined">person_add</span>
+                                            新增第一個客戶
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="add-customer-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full">
+            <div class="p-6 border-b">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-bold">新增客戶</h3>
+                    <button id="close-modal" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6">
+                <form id="customer-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">客戶名稱 *</label>
+                            <input type="text" id="customer-name" required class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700" placeholder="輸入客戶姓名">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">年齡</label>
+                            <input type="number" id="customer-age" min="18" max="100" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700" placeholder="輸入年齡">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">每月造訪次數</label>
+                            <input type="number" id="monthly-visits" min="0" max="30" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700" placeholder="輸入每月造訪次數">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">未造訪天數</label>
+                            <input type="number" id="days-since-last-visit" min="0" max="365" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700" placeholder="輸入未造訪天數">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">滿意度 (1-10)</label>
+                            <input type="range" id="satisfaction" min="1" max="10" value="5" class="w-full">
+                            <div class="flex justify-between text-xs text-slate-500 mt-1">
+                                <span>1 (非常不滿意)</span>
+                                <span id="satisfaction-value">5</span>
+                                <span>10 (非常滿意)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-6 border-t">
+                        <div class="flex justify-end gap-4">
+                            <button type="button" id="cancel-modal" class="px-6 py-2 border border-slate-200 dark:border-slate-700 rounded-lg font-semibold">取消</button>
+                            <button type="submit" id="save-customer" class="px-6 py-2 bg-primary text-white rounded-lg font-semibold">儲存客戶</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-background-dark text-slate-400 py-8 px-6 border-t border-primary/10">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="text-center md:text-left">
+                    <p class="text-sm">© 2025 茶言觀色·客戶流失風險評估器 v1.2.0</p>
+                    <p class="text-xs mt-1">客戶列表管理系統</p>
+                </div>
+                <div class="flex items-center gap-6">
+                    <a href="index.html" class="text-sm hover:text-primary">主頁</a>
+                    <a href="reports.html" class="text-sm hover:text-primary">數據報表</a>
+                    <a href="settings.html" class="text-sm hover:text-primary">系統設定</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            themeIcon.textContent = 'light_mode';
+        } else {
+            document.documentElement.classList.remove('dark');
+            themeIcon.textContent = 'dark_mode';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.textContent = 'light_mode';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.textContent = 'dark_mode';
+            }
+        });
+
+        // Customer Data Management
+        let customers = JSON.parse(localStorage.getItem('customers')) || [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCustomerList();
+            updateStats();
+            setupEventListeners();
+        });
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Modal buttons
+            document.getElementById('add-customer-btn').addEventListener('click', openAddCustomerModal);
+            document.getElementById('add-first-customer').addEventListener('click', openAddCustomerModal);
+            document.getElementById('close-modal').addEventListener('click', closeModal);
+            document.getElementById('cancel-modal').addEventListener('click', closeModal);
+            
+            // Form submission
+            document.getElementById('customer-form').addEventListener('submit', saveCustomer);
+            
+            // Search and filter
+            document.getElementById('search-input').addEventListener('input', updateCustomerList);
+            document.getElementById('filter-risk').addEventListener('change', updateCustomerList);
+            
+            // Satisfaction slider
+            document.getElementById('satisfaction').addEventListener('input', (e) => {
+                document.getElementById('satisfaction-value').textContent = e.target.value;
+            });
+            
+            // Export CSV
+            document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
+        }
+
+        // Modal Functions
+        function openAddCustomerModal() {
+            document.getElementById('add-customer-modal').classList.remove('hidden');
+            document.getElementById('customer-form').reset();
+            document.getElementById('satisfaction-value').textContent = '5';
+        }
+
+        function closeModal() {
+            document.getElementById('add-customer-modal').classList.add('hidden');
+        }
+
+        // Save Customer
+        function saveCustomer(e) {
+            e.preventDefault();
+            
+            const customer = {
+                id: 'CUST-' + Date.now().toString().slice(-6),
+                name: document.getElementById('customer-name').value,
+                age: parseInt(document.getElementById('customer-age').value) || 30,
+                monthlyVisits: parseInt(document.getElementById('monthly-visits').value) || 4,
+                daysSinceLastVisit: parseInt(document.getElementById('days-since-last-visit').value) || 7,
+                satisfaction: parseInt(document.getElementById('satisfaction').value) || 5,
+                probability: calculateChurnProbability(
+                    parseInt(document.getElementById('days-since-last-visit').value) || 7,
+                    parseInt(document.getElementById('satisfaction').value) || 5,
+                    parseInt(document.getElementById('monthly-visits').value) || 4,
+                    parseInt(document.getElementById('customer-age').value) || 30
+                ),
+                riskLevel: getRiskLevel(
+                    calculateChurnProbability(
+                        parseInt(document.getElementById('days-since-last-visit').value) || 7,
+                        parseInt(document.getElementById('satisfaction').value) || 5,
+                        parseInt(document.getElementById('monthly-visits').value) || 4,
+                        parseInt(document.getElementById('customer-age').value) || 30
+                    )
+                ),
+                assessmentDate: new Date().toLocaleDateString('zh-TW')
+            };
+            
+            customers.push(customer);
+            localStorage.setItem('customers', JSON.stringify(customers));
+            
+            closeModal();
+            updateCustomerList();
+            updateStats();
+        }
+
+        // Calculate Churn Probability
+        function calculateChurnProbability(daysSinceLastVisit, satisfaction, monthlyVisits, age) {
+            const baseRate = 28.5;
+            const daysWeight = 65.6;
+            const satisfactionWeight = 18.2;
+            const visitsWeight = 10.1;
+            const ageWeight = 6.1;
+            
+            const daysScore = Math.min(daysSinceLastVisit / 30, 1) * 100;
+            const satisfactionScore = (10 - satisfaction) * 10;
+            const visitsScore = Math.max(0, 10 - monthlyVisits) * 10;
+            const ageScore = Math.min(age / 100, 1) * 100;
+            
+            const weightedScore =
+                (daysScore * daysWeight +
+                 satisfactionScore * satisfactionWeight +
+                 visitsScore * visitsWeight +
+                 ageScore * ageWeight) / 100;
+            
+            const probability = baseRate + weightedScore;
+            
+            return Math.min(Math.max(probability, 0), 100);
+        }
+
+        function getRiskLevel(probability) {
+            if (probability >= 60) return 'high';
+            if (probability >= 40) return 'medium';
+            return 'low';
+        }
+
+        // Update Customer List
+        function updateCustomerList() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const riskFilter = document.getElementById('filter-risk').value;
+            
+            let filteredCustomers = customers.filter(customer => {
+                const matchesSearch = customer.name.toLowerCase().includes(searchTerm);
+                const matchesRisk = riskFilter === 'all' || customer.riskLevel === riskFilter;
+                return matchesSearch && matchesRisk;
+            });
+            
+            const tableBody = document.getElementById('customer-table-body');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (filteredCustomers.length === 0) {
+                emptyState.classList.remove('hidden');
+                tableBody.innerHTML = '';
+                tableBody.appendChild(emptyState);
+            } else {
+                emptyState.classList.add('hidden');
+                tableBody.innerHTML = '';
+                
+                filteredCustomers.forEach(customer => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/50';
+                    row.innerHTML = `
+                        <td class="py-4 px-6">
+                            <div class="font-medium">${customer.name}</div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400">${customer.id}</div>
+                        </td>
+                        <td class="py-4 px-6">${customer.age}</td>
+                        <td class="py-4 px-6">${customer.monthlyVisits}</td>
+                        <td class="py-4 px-6">${customer.daysSinceLastVisit}</td>
+                        <td class="py-4 px-6">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-amber-600">star</span>
+                                ${customer.satisfaction}/10
+                            </div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="font-bold ${customer.riskLevel === 'high' ? 'text-rose-600' : customer.riskLevel === 'medium' ? 'text-amber-600' : 'text-emerald-600'}">
+                                ${customer.probability.toFixed(1)}%
+                            </div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold ${customer.riskLevel === 'high' ? 'risk-high' : customer.riskLevel === 'medium' ? 'risk-medium' : 'risk-low'}">
+                                ${customer.riskLevel === 'high' ? '高風險' : customer.riskLevel === 'medium' ? '中風險' : '低風險'}
+                            </span>
+                        </td>
+                        <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-400">${customer.assessmentDate}</td>
+                        <td class="py-4 px-6">
+                            <div class="flex items-center gap-2">
+                                <button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded" onclick="editCustomer('${customer.id}')">
+                                    <span class="material-symbols-outlined text-primary">edit</span>
+                                </button>
+                                <button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded" onclick="deleteCustomer('${customer.id}')">
+                                    <span class="material-symbols-outlined text-rose-600">delete</span>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+
+        // Update Stats
+        function updateStats() {
+            if (customers.length === 0) {
+                document.getElementById('total-customers').textContent = '0';
+                document.getElementById('high-risk-count').textContent = '0';
+                document.getElementById('avg-probability').textContent = '0%';
+                document.getElementById('last-updated').textContent = '-';
+                return;
+            }
+            
+            const highRiskCount = customers.filter(c => c.riskLevel === 'high').length;
+            const totalProbability = customers.reduce((sum, c) => sum + c.probability, 0);
+            const avgProbability = totalProbability / customers.length;
+            
+            document.getElementById('total-customers').textContent = customers.length;
+            document.getElementById('high-risk-count').textContent = highRiskCount;
+            document.getElementById('avg-probability').textContent = avgProbability.toFixed(1) + '%';
+            document.getElementById('last-updated').textContent = new Date().toLocaleDateString('zh-TW');
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            if (customers.length === 0) {
+                alert('沒有客戶資料可以匯出');
+                return;
+            }
+            
+            const headers = ['客戶名稱', '年齡', '每月造訪', '未造訪天數', '滿意度', '流失機率', '風險等級', '評估日期'];
+            const csvRows = [
+                headers.join(','),
+                ...customers.map(customer => [
+                    customer.name,
+                    customer.age,
+                    customer.monthlyVisits,
+                    customer.daysSinceLastVisit,
+                    customer.satisfaction,
+                    customer.probability.toFixed(1),
+                    customer.riskLevel === 'high' ? '高風險' : customer.riskLevel === 'medium' ? '中風險' : '低風險',
+                    customer.assessmentDate
+                ].join(','))
+            ];
+            
+            const csvString = csvRows.join('\n');
+            const blob = new Blob(['\uFEFF' + csvString], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `客戶列表_${new Date().toISOString().slice(0, 10)}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        // Edit Customer
+        function editCustomer(id) {
+            const customer = customers.find(c => c.id === id);
+            if (!customer) return;
+            
+            document.getElementById('customer-name').value = customer.name;
+            document.getElementById('customer-age').value = customer.age;
+            document.getElementById('monthly-visits').value = customer.monthlyVisits;
+            document.getElementById('days-since-last-visit').value = customer.daysSinceLastVisit;
+            document.getElementById('satisfaction').value = customer.satisfaction;
+            document.getElementById('satisfaction-value').textContent = customer.satisfaction;
+            
+            openAddCustomerModal();
+            
+            // Remove old customer
+            customers = customers.filter(c => c.id !== id);
+        }
+
+        // Delete Customer
+        function deleteCustomer(id) {
+            if (confirm('確定要刪除這個客戶嗎？')) {
+                customers = customers.filter(c => c.id !== id);
+                localStorage.setItem('customers', JSON.stringify(customers));
+                updateCustomerList();
+                updateStats();
+            }
+        }
+    </script>
+</body>
+</html>

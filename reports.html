@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>數據報表 - 茶言觀色·客戶流失風險評估器</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6b8f24",
+                        "background-light": "#f7f8f6",
+                        "background-dark": "#1b1f13",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans", "Noto Sans TC", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Work Sans', 'Noto Sans TC', sans-serif; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
+    <header class="flex items-center justify-between border-b border-primary/10 bg-white dark:bg-background-dark px-6 py-3 sticky top-0">
+        <div class="flex items-center gap-4">
+            <div class="size-8 text-primary">
+                <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+                </svg>
+            </div>
+            <h2 class="text-lg font-bold">茶言觀色·客戶流失風險評估器</h2>
+        </div>
+        <div class="flex items-center gap-4">
+            <button id="theme-toggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
+                <span id="theme-icon" class="material-symbols-outlined">dark_mode</span>
+            </button>
+            <nav class="hidden md:flex items-center gap-6">
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="index.html">主頁</a>
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="churn_risk_assessment_dashboard_1/code.html">雙語儀表板</a>
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="churn_risk_assessment_dashboard_3/code.html">中文儀表板</a>
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="customer_list.html">客戶列表</a>
+                <a class="text-primary border-b-2 border-primary pb-1" href="reports.html">數據報表</a>
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="settings.html">系統設定</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="p-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-8">
+                <h1 class="text-3xl font-black mb-2">數據報表</h1>
+                <p class="text-slate-600 dark:text-slate-400">分析客戶流失風險趨勢，查看統計數據與圖表。</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">總評估次數</p>
+                            <p id="total-assessments" class="text-3xl font-bold">0</p>
+                        </div>
+                        <div class="size-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                            <span class="material-symbols-outlined">assessment</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">高風險比例</p>
+                            <p id="high-risk-percentage" class="text-3xl font-bold text-rose-600">0%</p>
+                        </div>
+                        <div class="size-12 rounded-lg bg-rose-100 dark:bg-rose-900/20 text-rose-600 flex items-center justify-center">
+                            <span class="material-symbols-outlined">warning</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">平均流失機率</p>
+                            <p id="avg-churn-probability" class="text-3xl font-bold text-amber-600">0%</p>
+                        </div>
+                        <div class="size-12 rounded-lg bg-amber-100 dark:bg-amber-900/20 text-amber-600 flex items-center justify-center">
+                            <span class="material-symbols-outlined">trending_up</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <h3 class="text-lg font-bold mb-4">風險等級分布</h3>
+                    <div class="h-64">
+                        <canvas id="risk-distribution-chart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <h3 class="text-lg font-bold mb-4">流失機率趨勢</h3>
+                    <div class="h-64">
+                        <canvas id="churn-trend-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <h3 class="text-lg font-bold mb-4">滿意度分布</h3>
+                    <div class="h-64">
+                        <canvas id="satisfaction-chart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <h3 class="text-lg font-bold mb-4">造訪頻率分析</h3>
+                    <div class="h-64">
+                        <canvas id="visits-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                <h3 class="text-lg font-bold mb-4">詳細統計數據</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-slate-50 dark:bg-slate-800">
+                            <tr>
+                                <th class="py-3 px-4 text-left">統計項目</th>
+                                <th class="py-3 px-4 text-left">數值</th>
+                                <th class="py-3 px-4 text-left">說明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-slate-100 dark:border-slate-800">
+                                <td class="py-3 px-4">總客戶數</td>
+                                <td class="py-3 px-4 font-bold" id="stat-total-customers">0</td>
+                                <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-400">已評估的客戶總數</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 dark:border-slate-800">
+                                <td class="py-3 px-4">高風險客戶數</td>
+                                <td class="py-3 px-4 font-bold text-rose-600" id="stat-high-risk">0</td>
+                                <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-400">流失機率 ≥ 60% 的客戶</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 dark:border-slate-800">
+                                <td class="py-3 px-4">中風險客戶數</td>
+                                <td class="py-3 px-4 font-bold text-amber-600" id="stat-medium-risk">0</td>
+                                <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-400">流失機率 40-59% 的客戶</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 dark:border-slate-800">
+                                <td class="py-3 px-4">低風險客戶數</td>
+                                <td class="py-3 px-4 font-bold text-emerald-600" id="stat-low-risk">0</td>
+                                <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-400">流失機率 < 40% 的客戶</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 dark:border-slate-800">
+                                <td class="py-3 px-4">平均年齡</td>
+                                <td class="py-3 px-4 font-bold" id="stat-avg-age">0</td>
+                                <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-400">客戶平均年齡</td>
+                            </tr>
+                            <tr class="border-b border-slate-100 dark:border-slate-800">
+                                <td class="py-3 px-4">平均每月造訪</td>
+                                <td class="py-3 px-4 font-bold" id="stat-avg-visits">0</td>
+                                <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-400">客戶平均每月造訪次數</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4">平均未造訪天數</td>
+                                <td class="py-3 px-4 font-bold" id="stat-avg-days">0</td>
+                                <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-400">客戶平均未造訪天數</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-background-dark text-slate-400 py-8 px-6 border-t border-primary/10">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="text-center md:text-left">
+                    <p class="text-sm">© 2025 茶言觀色·客戶流失風險評估器 v1.2.0</p>
+                    <p class="text-xs mt-1">數據分析與報表系統</p>
+                </div>
+                <div class="flex items-center gap-6">
+                    <a href="index.html" class="text-sm hover:text-primary">主頁</a>
+                    <a href="customer_list.html" class="text-sm hover:text-primary">客戶列表</a>
+                    <a href="settings.html" class="text-sm hover:text-primary">系統設定</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            themeIcon.textContent = 'light_mode';
+        } else {
+            document.documentElement.classList.remove('dark');
+            themeIcon.textContent = 'dark_mode';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.textContent = 'light_mode';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.textContent = 'dark_mode';
+            }
+        });
+
+        // Load customer data
+        let customers = JSON.parse(localStorage.getItem('customers')) || [];
+        let charts = {};
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStats();
+            createCharts();
+        });
+
+        // Update Statistics
+        function updateStats() {
+            if (customers.length === 0) {
+                // Set default values
+                document.getElementById('total-assessments').textContent = '0';
+                document.getElementById('high-risk-percentage').textContent = '0%';
+                document.getElementById('avg-churn-probability').textContent = '0%';
+                
+                document.getElementById('stat-total-customers').textContent = '0';
+                document.getElementById('stat-high-risk').textContent = '0';
+                document.getElementById('stat-medium-risk').textContent = '0';
+                document.getElementById('stat-low-risk').textContent = '0';
+                document.getElementById('stat-avg-age').textContent = '0';
+                document.getElementById('stat-avg-visits').textContent = '0';
+                document.getElementById('stat-avg-days').textContent = '0';
+                return;
+            }
+            
+            // Calculate statistics
+            const totalCustomers = customers.length;
+            const highRiskCount = customers.filter(c => c.riskLevel === 'high').length;
+            const mediumRiskCount = customers.filter(c => c.riskLevel === 'medium').length;
+            const lowRiskCount = customers.filter(c => c.riskLevel === 'low').length;
+            
+            const highRiskPercentage = ((highRiskCount / totalCustomers) * 100).toFixed(1);
+            const totalProbability = customers.reduce((sum, c) => sum + c.probability, 0);
+            const avgProbability = totalProbability / totalCustomers;
+            
+            const totalAge = customers.reduce((sum, c) => sum + c.age, 0);
+            const avgAge = totalAge / totalCustomers;
+            
+            const totalVisits = customers.reduce((sum, c) => sum + c.monthlyVisits, 0);
+            const avgVisits = totalVisits / totalCustomers;
+            
+            const totalDays = customers.reduce((sum, c) => sum + c.daysSinceLastVisit, 0);
+            const avgDays = totalDays / totalCustomers;
+            
+            // Update display
+            document.getElementById('total-assessments').textContent = totalCustomers;
+            document.getElementById('high-risk-percentage').textContent = highRiskPercentage + '%';
+            document.getElementById('avg-churn-probability').textContent = avgProbability.toFixed(1) + '%';
+            
+            document.getElementById('stat-total-customers').textContent = totalCustomers;
+            document.getElementById('stat-high-risk').textContent = highRiskCount;
+            document.getElementById('stat-medium-risk').textContent = mediumRiskCount;
+            document.getElementById('stat-low-risk').textContent = lowRiskCount;
+            document.getElementById('stat-avg-age').textContent = avgAge.toFixed(1);
+            document.getElementById('stat-avg-visits').textContent = avgVisits.toFixed(1);
+            document.getElementById('stat-avg-days').textContent = avgDays.toFixed(1);
+        }
+
+        // Create Charts
+        function createCharts() {
+            // Risk Distribution Chart
+            const riskCtx = document.getElementById('risk-distribution-chart').getContext('2d');
+            const riskData = getRiskDistributionData();
+            
+            charts.riskDistribution = new Chart(riskCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['高風險', '中風險', '低風險'],
+                    datasets: [{
+                        data: riskData,
+                        backgroundColor: [
+                            '#dc2626', // red-600
+                            '#d97706', // amber-600
+                            '#059669'  // emerald-600
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Churn Trend Chart
+            const trendCtx = document.getElementById('churn-trend-chart').getContext('2d');
+            const trendData = getChurnTrendData();
+            
+            charts.churnTrend = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                    datasets: [{
+                        label: '平均流失機率',
+                        data: trendData,
+                        borderColor: '#6b8f24',
+                        backgroundColor: 'rgba(107, 143, 36, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: '流失機率 (%)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Satisfaction Chart
+            const satisfactionCtx = document.getElementById('satisfaction-chart').getContext('2d');
+            const satisfactionData = getSatisfactionData();
+            
+            charts.satisfaction = new Chart(satisfactionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1-2', '3-4', '5-6', '7-8', '9-10'],
+                    datasets: [{
+                        label: '客戶數',
+                        data: satisfactionData,
+                        backgroundColor: '#6b8f24',
+                        borderColor: '#6b8f24',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '客戶數'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '滿意度分數'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Visits Chart
+            const visitsCtx = document.getElementById('visits-chart').getContext('2d');
+            const visitsData = getVisitsData();
+            
+            charts.visits = new Chart(visitsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['0-2', '3-5', '6-8', '9-11', '12+'],
+                    datasets: [{
+                        label: '客戶數',
+                        data: visitsData,
+                        backgroundColor: '#dc2626',
+                        borderColor: '#dc2626',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '客戶數'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '每月造訪次數'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Get Risk Distribution Data
+        function getRiskDistributionData() {
+            if (customers.length === 0) return [1, 1, 1];
+            
+            const highRiskCount = customers.filter(c => c.riskLevel === 'high').length;
+            const mediumRiskCount = customers.filter(c => c.riskLevel === 'medium').length;
+            const lowRiskCount = customers.filter(c => c.riskLevel === 'low').length;
+            
+            return [highRiskCount, mediumRiskCount, lowRiskCount];
+        }
+
+        // Get Churn Trend Data
+        function getChurnTrendData() {
+            // Generate sample data for demonstration
+            return Array.from({length: 12}, (_, i) => {
+                const base = 30 + Math.sin(i * 0.5) * 10;
+                return Math.min(Math.max(base + Math.random() * 10, 20), 80);
+            });
+        }
+
+        // Get Satisfaction Data
+        function getSatisfactionData() {
+            if (customers.length === 0) return [1, 1, 1, 1, 1];
+            
+            const ranges = [
+                {min: 1, max: 2},
+                {min: 3, max: 4},
+                {min: 5, max: 6},
+                {min: 7, max: 8},
+                {min: 9, max: 10}
+            ];
+            
+            return ranges.map(range => {
+                return customers.filter(c => c.satisfaction >= range.min && c.satisfaction <= range.max).length;
+            });
+        }
+
+        // Get Visits Data
+        function getVisitsData() {
+            if (customers.length === 0) return [1, 1, 1, 1, 1];
+            
+            const ranges = [
+                {min: 0, max: 2},
+                {min: 3, max: 5},
+                {min: 6, max: 8},
+                {min: 9, max: 11},
+                {min: 12, max: 30}
+            ];
+            
+            return ranges.map(range => {
+                return customers.filter(c => c.monthlyVisits >= range.min && c.monthlyVisits <= range.max).length;
+            });
+        }
+
+        // Update Charts
+        function updateCharts() {
+            if (charts.riskDistribution) {
+                charts.riskDistribution.data.datasets[0].data = getRiskDistributionData();
+                charts.riskDistribution.update();
+            }
+            
+            if (charts.satisfaction) {
+                charts.satisfaction.data.datasets[0].data = getSatisfactionData();
+                charts.satisfaction.update();
+            }
+            
+            if (charts.visits) {
+                charts.visits.data.datasets[0].data = getVisitsData();
+                charts.visits.update();
+            }
+        }
+
+        // Refresh Data
+        function refreshData() {
+            customers = JSON.parse(localStorage.getItem('customers')) || [];
+            updateStats();
+            updateCharts();
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(refreshData, 30000);
+    </script>
+</body>
+</html>

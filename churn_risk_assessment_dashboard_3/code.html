@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-TW"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>流失風險評估儀表板 - Tea Observation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;900&amp;family=Noto+Sans+TC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6b8f24",
+                        "background-light": "#f7f8f6",
+                        "background-dark": "#1b1f13",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans", "Noto Sans TC", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body { font-family: 'Work Sans', 'Noto Sans TC', sans-serif; }
+        .bg-tea-texture {
+            background-color: #f7f8f6;
+            background-image: radial-gradient(#6b8f2411 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/10 bg-white dark:bg-background-dark px-10 py-3 sticky top-0 z-50">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8">
+<svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">Tea Observation 流失風險評估系統</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8 items-center">
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-primary text-sm font-semibold border-b-2 border-primary pb-1" href="#">儀表板</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="../customer_list.html">客戶列表</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="../reports.html">數據報表</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="../settings.html">系統設定</a>
+</nav>
+<div class="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30">
+<img class="w-full h-full object-cover" data-alt="Manager profile photo avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3d8m8dPDzV7Y5d1-uypWlkxkS-RvhCyStxYmPi91OYaogS2Ct5oWNN9kU91Ze4sHPA2owB96TZ9WQRz3dFvm13e-dohWxRG7RIdFcmxHycBiM_6TX2LKe9gIojrPazuUiQeyNALd4LLiimQH1RaZPNyIOAuGcxpzRbKaV90PZnbUaHss4o7BD9KeHkghrBOIZ5J-ZZCqdn4mJrWFV-D88P2CGsu9a1koNlDkuupHxc8mcSE7tqn8jQxz32BXrzVjJXEfVT_nzDt4"/>
+</div>
+</div>
+</header>
+<main class="flex flex-1 overflow-hidden h-[calc(100vh-65px)]">
+<aside class="w-[400px] border-r border-primary/10 bg-white/50 dark:bg-background-dark/50 overflow-y-auto p-6 scrollbar-hide">
+<div class="flex flex-col gap-6">
+<div>
+<h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">客戶個人資料</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm mt-1">請輸入基本人口統計與行為數據</p>
+</div>
+<div class="bg-primary/5 dark:bg-primary/10 rounded-xl p-6 border border-primary/10 flex flex-col gap-5">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Age / 年齡</label>
+<input id="age-input" class="w-full rounded-lg border-primary/20 bg-white dark:bg-background-dark focus:ring-primary focus:border-primary text-slate-900 dark:text-slate-100" placeholder="例如：28" type="number" min="1" max="120"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Monthly Visits / 每月造訪次數</label>
+<input id="visits-input" class="w-full rounded-lg border-primary/20 bg-white dark:bg-background-dark focus:ring-primary focus:border-primary text-slate-900 dark:text-slate-100" placeholder="例如：12" type="number" min="0" max="100"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Days Since Last Visit / 距上次造訪天數</label>
+<input id="days-input" class="w-full rounded-lg border-primary/20 bg-white dark:bg-background-dark focus:ring-primary focus:border-primary text-slate-900 dark:text-slate-100" placeholder="例如：45" type="number" min="0" max="365"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Satisfaction Score / 滿意度評分</label>
+<div class="flex gap-2 items-center">
+<button class="w-10 h-10 rounded-lg border border-primary/30 bg-primary/20 text-primary flex items-center justify-center font-bold satisfaction-btn" data-score="1">1</button>
+<button class="w-10 h-10 rounded-lg border border-primary/30 bg-primary text-white flex items-center justify-center font-bold satisfaction-btn" data-score="2">2</button>
+<button class="w-10 h-10 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-background-dark flex items-center justify-center font-bold text-slate-400 satisfaction-btn" data-score="3">3</button>
+<button class="w-10 h-10 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-background-dark flex items-center justify-center font-bold text-slate-400 satisfaction-btn" data-score="4">4</button>
+<button class="w-10 h-10 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-background-dark flex items-center justify-center font-bold text-slate-400 satisfaction-btn" data-score="5">5</button>
+<input type="hidden" id="satisfaction-input" value="2">
+</div>
+</div>
+<div class="flex flex-col gap-3 pt-4">
+<button id="assess-btn" class="w-full py-3 bg-primary hover:bg-primary/90 text-white rounded-lg font-bold shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+                         評估風險
+                     </button>
+<button class="w-full py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-lg font-semibold transition-all">
+                        重設
+                    </button>
+</div>
+</div>
+<div class="p-4 rounded-xl border border-dashed border-primary/30 bg-primary/5">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary">info</span>
+<p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                        預測結果基於過去 12 個月活躍會員的歷史行為模式分析得出。
+                    </p>
+</div>
+</div>
+</div>
+</aside>
+<section class="flex-1 bg-tea-texture overflow-y-auto p-8 lg:p-12 relative">
+<div class="max-w-4xl mx-auto flex flex-col gap-10">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">風險評估結果</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-2">客戶編號分析：#TEA-88219</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/20 bg-primary/5 text-sm font-bold text-primary hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-[18px]">refresh</span> 重新評估
+                    </button>
+<button id="export-pdf-btn" class="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-background-dark text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50">
+<span class="material-symbols-outlined text-[18px]">download</span> 匯出 PDF
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-background-dark text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50">
+<span class="material-symbols-outlined text-[18px]">share</span> 分享
+                    </button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-primary/5 flex flex-col items-center justify-center text-center group">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">流失機率</h3>
+<div class="relative flex items-center justify-center">
+<svg class="w-48 h-48 transform -rotate-90">
+<circle class="text-slate-100 dark:text-slate-800" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-width="12"></circle>
+<circle id="probability-circle" class="text-rose-500" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" stroke-dasharray="552.92" stroke-dashoffset="110.58" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span id="probability-value" class="text-5xl font-black text-slate-900 dark:text-slate-100">80%</span>
+<span id="risk-level-text" class="text-rose-500 font-bold text-sm">極高風險</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-primary/5 flex flex-col gap-6">
+<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest">風險等級</h3>
+<div class="flex flex-col gap-4">
+<div id="risk-level-indicator" class="flex items-center justify-between p-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/30">
+<div class="flex items-center gap-3">
+<div class="size-3 rounded-full bg-rose-500 animate-pulse"></div>
+<span id="risk-level-title" class="text-rose-700 dark:text-rose-400 font-bold">高風險等級</span>
+</div>
+<span class="material-symbols-outlined text-rose-500">warning</span>
+</div>
+<p id="risk-description" class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                            此客戶表現出典型流失用戶的模式： <br/>
+<span class="font-bold text-slate-800 dark:text-slate-200">• 低滿意度評分 (2/5)</span><br/>
+<span class="font-bold text-slate-800 dark:text-slate-200">• 長期未活動 (45 天)</span>
+</p>
+</div>
+<div class="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800">
+<div class="flex items-center justify-between text-xs text-slate-500">
+<span>分析可信度</span>
+<span class="font-bold">94.2%</span>
+</div>
+<div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full mt-2 overflow-hidden">
+<div class="h-full bg-primary w-[94%]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-primary/5">
+<div class="flex items-center gap-3 mb-8">
+<div class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined">lightbulb</span>
+</div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-slate-100">行動建議</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="p-5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:border-primary/40 transition-all cursor-pointer group">
+<div class="flex items-start gap-4">
+<div class="size-10 rounded-full bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">local_offer</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-slate-800 dark:text-slate-200 group-hover:text-primary">提供專屬折扣優惠</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">針對其喜愛的烏龍茶系列提供 20% 折扣優惠，鼓勵再次回購。</p>
+</div>
+<span class="material-symbols-outlined text-slate-300">chevron_right</span>
+</div>
+</div>
+<div class="p-5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:border-primary/40 transition-all cursor-pointer group">
+<div class="flex items-start gap-4">
+<div class="size-10 rounded-full bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center text-amber-500">
+<span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-slate-800 dark:text-slate-200 group-hover:text-primary">發送售後滿意度調查</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">透過電話或郵件了解低評分的具體原因，進行服務品質補償。</p>
+</div>
+<span class="material-symbols-outlined text-slate-300">chevron_right</span>
+</div>
+</div>
+<div class="p-5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:border-primary/40 transition-all cursor-pointer group">
+<div class="flex items-start gap-4">
+<div class="size-10 rounded-full bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center text-blue-500">
+<span class="material-symbols-outlined text-[20px]">group</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-slate-800 dark:text-slate-200 group-hover:text-primary">邀請加入 VIP 社群</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">邀請參與下週五的私人季節品茗會，增強品牌情感連結。</p>
+</div>
+<span class="material-symbols-outlined text-slate-300">chevron_right</span>
+</div>
+</div>
+<div class="p-5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:border-primary/40 transition-all cursor-pointer group">
+<div class="flex items-start gap-4">
+<div class="size-10 rounded-full bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">stars</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-slate-800 dark:text-slate-200 group-hover:text-primary">會員等級升級提醒</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">通知客戶僅需再消費一次即可解鎖金級會員專屬獎勵。</p>
+</div>
+<span class="material-symbols-outlined text-slate-300">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<div class="fixed bottom-0 right-0 p-8 pointer-events-none opacity-5 dark:opacity-10">
+<svg class="w-64 h-64 text-primary" fill="currentColor" viewBox="0 0 100 100">
+<path d="M50 0 C 70 30 100 40 100 60 C 100 80 80 100 50 100 C 20 100 0 80 0 60 C 0 40 30 30 50 0"></path>
+</svg>
+</div>
+
+    <!-- JavaScript for Churn Risk Assessment (Traditional Chinese Version) -->
+    <script>
+        // Satisfaction score buttons
+        const satisfactionButtons = document.querySelectorAll('.satisfaction-btn');
+        const satisfactionInput = document.getElementById('satisfaction-input');
+        const assessBtn = document.getElementById('assess-btn');
+        
+        // Set initial satisfaction score (2)
+        let selectedScore = 2;
+        
+        // Update satisfaction button styles
+        function updateSatisfactionButtons(score) {
+            satisfactionButtons.forEach(btn => {
+                const btnScore = parseInt(btn.getAttribute('data-score'));
+                if (btnScore === score) {
+                    btn.classList.add('bg-primary', 'text-white');
+                    btn.classList.remove('bg-primary/20', 'text-primary', 'bg-white', 'dark:bg-background-dark', 'text-slate-400');
+                    btn.classList.remove('border-slate-200', 'dark:border-slate-700');
+                    btn.classList.add('border-primary/30');
+                } else if (btnScore === 1) {
+                    btn.classList.remove('bg-primary', 'text-white');
+                    btn.classList.add('bg-primary/20', 'text-primary');
+                    btn.classList.add('border-primary/30');
+                } else {
+                    btn.classList.remove('bg-primary', 'text-white', 'bg-primary/20', 'text-primary');
+                    btn.classList.add('bg-white', 'dark:bg-background-dark', 'text-slate-400');
+                    btn.classList.add('border-slate-200', 'dark:border-slate-700');
+                }
+            });
+            satisfactionInput.value = score;
+            selectedScore = score;
+        }
+        
+        // Initialize satisfaction buttons
+        satisfactionButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const score = parseInt(btn.getAttribute('data-score'));
+                updateSatisfactionButtons(score);
+            });
+        });
+        
+        // Calculate churn risk based on PRD algorithm
+        function calculateChurnRisk(age, visits, days, satisfaction) {
+            // Base probability from overall churn rate
+            let probability = 28.5; // 28.5% base churn rate
+            
+            // Apply rules from PRD section 4.1 and 4.2
+            // 1. Days Since Last Visit (65.6% importance)
+            if (days > 60) {
+                probability += 16.7; // High risk: 45.2% - 28.5% = 16.7%
+            } else if (days >= 30 && days <= 60) {
+                probability += 8.5; // Medium risk
+            }
+            
+            // 2. Satisfaction Score (18.2% importance)
+            if (satisfaction <= 2) {
+                probability += 14.4; // High risk: 42.9% - 28.5% = 14.4%
+            } else if (satisfaction === 3) {
+                probability += 6.5; // Medium risk
+            }
+            
+            // 3. Monthly Visits (10.1% importance)
+            if (visits <= 3) {
+                probability += 10.2; // High risk: 38.7% - 28.5% = 10.2%
+            } else if (visits >= 4 && visits <= 6) {
+                probability += 4.5; // Medium risk
+            }
+            
+            // 4. Age (6.1% importance) - minor adjustment
+            if (age < 25 || age > 60) {
+                probability += 3.0; // Slightly higher risk for younger/older customers
+            }
+            
+            // Cap probability between 5% and 95%
+            probability = Math.max(5, Math.min(95, probability));
+            
+            // Determine risk level with Chinese text
+            let riskLevel, riskColor, riskText;
+            if (probability >= 60) {
+                riskLevel = '極高風險';
+                riskColor = 'rose';
+                riskText = '高風險等級';
+            } else if (probability >= 40) {
+                riskLevel = '中風險';
+                riskColor = 'amber';
+                riskText = '中風險等級';
+            } else {
+                riskLevel = '低風險';
+                riskColor = 'emerald';
+                riskText = '低風險等級';
+            }
+            
+            return {
+                probability: Math.round(probability),
+                riskLevel,
+                riskColor,
+                riskText
+            };
+        }
+        
+        // Update UI with results (Chinese version)
+        function updateResults(age, visits, days, satisfaction, results) {
+            // Update probability circle
+            const circle = document.getElementById('probability-circle');
+            const circumference = 2 * Math.PI * 88; // 2πr
+            const offset = circumference - (results.probability / 100) * circumference;
+            circle.style.strokeDashoffset = offset;
+            
+            // Update probability value
+            document.getElementById('probability-value').textContent = `${results.probability}%`;
+            
+            // Update risk level text
+            document.getElementById('risk-level-text').textContent = results.riskLevel;
+            document.getElementById('risk-level-text').className = `text-${results.riskColor}-500 font-bold text-sm`;
+            
+            // Update risk level indicator
+            const indicator = document.getElementById('risk-level-indicator');
+            indicator.className = `flex items-center justify-between p-4 rounded-xl bg-${results.riskColor}-50 dark:bg-${results.riskColor}-900/20 border border-${results.riskColor}-200 dark:border-${results.riskColor}-900/30`;
+            
+            // Update risk level title
+            document.getElementById('risk-level-title').textContent = results.riskText;
+            document.getElementById('risk-level-title').className = `text-${results.riskColor}-700 dark:text-${results.riskColor}-400 font-bold`;
+            
+            // Update risk description (Chinese)
+            let description = `此客戶`;
+            if (results.riskLevel === '極高風險') {
+                description += `表現出典型流失用戶的模式： <br/>`;
+            } else if (results.riskLevel === '中風險') {
+                description += `表現出一些需要關注的模式： <br/>`;
+            } else {
+                description += `表現出相對穩定的模式： <br/>`;
+            }
+            
+            // Add specific factors in Chinese
+            const factors = [];
+            if (days > 60) factors.push(`• 長期未活動 (${days} 天)`);
+            if (days >= 30 && days <= 60) factors.push(`• 中度未活動 (${days} 天)`);
+            if (satisfaction <= 2) factors.push(`• 低滿意度評分 (${satisfaction}/5)`);
+            if (satisfaction === 3) factors.push(`• 普通滿意度評分 (${satisfaction}/5)`);
+            if (satisfaction >= 4) factors.push(`• 良好滿意度評分 (${satisfaction}/5)`);
+            if (visits <= 3) factors.push(`• 低造訪頻率 (${visits} 次/月)`);
+            if (visits >= 4 && visits <= 6) factors.push(`• 中度造訪頻率 (${visits} 次/月)`);
+            if (visits > 6) factors.push(`• 高造訪頻率 (${visits} 次/月)`);
+            
+            description += factors.slice(0, 3).join('<br/>');
+            document.getElementById('risk-description').innerHTML = description;
+        }
+        
+        // Handle assess button click
+        assessBtn.addEventListener('click', () => {
+            // Get input values
+            const age = parseInt(document.getElementById('age-input').value) || 30;
+            const visits = parseInt(document.getElementById('visits-input').value) || 5;
+            const days = parseInt(document.getElementById('days-input').value) || 30;
+            const satisfaction = parseInt(satisfactionInput.value) || 3;
+            
+            // Calculate churn risk
+            const results = calculateChurnRisk(age, visits, days, satisfaction);
+            
+            // Update UI
+            updateResults(age, visits, days, satisfaction, results);
+            
+            // Scroll to results section
+            document.querySelector('main section:nth-child(2)').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // Initialize with default values
+        updateSatisfactionButtons(2);
+        
+        // PDF Export functionality (Chinese version)
+        const exportPdfBtn = document.getElementById('export-pdf-btn');
+        
+        exportPdfBtn.addEventListener('click', () => {
+            // Get current input values
+            const age = parseInt(document.getElementById('age-input').value) || 30;
+            const visits = parseInt(document.getElementById('visits-input').value) || 5;
+            const days = parseInt(document.getElementById('days-input').value) || 30;
+            const satisfaction = parseInt(satisfactionInput.value) || 3;
+            
+            // Calculate churn risk for PDF
+            const results = calculateChurnRisk(age, visits, days, satisfaction);
+            
+            // Create a temporary element for PDF generation
+            const pdfElement = document.createElement('div');
+            pdfElement.style.padding = '20px';
+            pdfElement.style.backgroundColor = 'white';
+            pdfElement.style.color = 'black';
+            pdfElement.style.fontFamily = "'Work Sans', 'Noto Sans TC', sans-serif";
+            
+            // Get current date
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Build PDF content (Chinese version)
+            pdfElement.innerHTML = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #6b8f24; font-size: 24px; margin-bottom: 5px;">流失風險評估報告</h1>
+                    <h2 style="color: #6b8f24; font-size: 18px; margin-bottom: 5px;">茶言觀色·客戶流失風險評估器</h2>
+                    <p style="color: #666; font-size: 14px;">生成時間：${dateStr}</p>
+                </div>
+                
+                <div style="border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+                    <h3 style="color: #333; font-size: 18px; margin-bottom: 15px;">客戶資料</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #eee; width: 40%;"><strong>年齡：</strong></td>
+                            <td style="padding: 8px; border-bottom: 1px solid #eee;">${age} 歲</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>每月造訪次數：</strong></td>
+                            <td style="padding: 8px; border-bottom: 1px solid #eee;">${visits} 次</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>距上次造訪天數：</strong></td>
+                            <td style="padding: 8px; border-bottom: 1px solid #eee;">${days} 天</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;"><strong>滿意度評分：</strong></td>
+                            <td style="padding: 8px;">${satisfaction}/5</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div style="border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+                    <h3 style="color: #333; font-size: 18px; margin-bottom: 15px;">風險評估結果</h3>
+                    
+                    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                        <div style="flex: 1; text-align: center;">
+                            <div style="font-size: 36px; font-weight: bold; color: ${results.riskLevel === '極高風險' ? '#dc2626' : results.riskLevel === '中風險' ? '#d97706' : '#059669'};">
+                                ${results.probability}%
+                            </div>
+                            <div style="font-size: 14px; color: #666;">流失機率</div>
+                        </div>
+                        <div style="flex: 2; padding-left: 20px;">
+                            <div style="padding: 10px 15px; background-color: ${results.riskLevel === '極高風險' ? '#fef2f2' : results.riskLevel === '中風險' ? '#fffbeb' : '#f0fdf4'};
+                                        border: 1px solid ${results.riskLevel === '極高風險' ? '#fecaca' : results.riskLevel === '中風險' ? '#fde68a' : '#bbf7d0'};
+                                        border-radius: 6px; margin-bottom: 10px;">
+                                <strong style="color: ${results.riskLevel === '極高風險' ? '#dc2626' : results.riskLevel === '中風險' ? '#d97706' : '#059669'};">${results.riskText}</strong>
+                            </div>
+                            <p style="color: #555; font-size: 14px; line-height: 1.5;">
+                                ${document.getElementById('risk-description').textContent}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+                    <h3 style="color: #333; font-size: 18px; margin-bottom: 15px;">建議行動方案</h3>
+                    <ul style="color: #555; font-size: 14px; line-height: 1.6; padding-left: 20px;">
+                        <li>監控客戶互動情況，考慮主動聯繫關懷</li>
+                        <li>檢視滿意度回饋，解決服務品質問題</li>
+                        <li>根據造訪頻率模式提供個人化優惠</li>
+                        <li>實施留客策略後安排後續評估追蹤</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 12px;">
+                    <p>茶言觀色·客戶流失風險評估器 v1.0 • 基於 7,892 個客戶樣本數據分析</p>
+                    <p>整體流失率：28.5% • 模型可信度：94.2%</p>
+                </div>
+            `;
+            
+            // Generate PDF
+            const options = {
+                margin: [10, 10, 10, 10],
+                filename: `流失風險評估報告_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait'
+                }
+            };
+            
+            // Show loading state
+            const originalText = exportPdfBtn.innerHTML;
+            exportPdfBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">hourglass_empty</span> 正在生成 PDF...';
+            exportPdfBtn.disabled = true;
+            
+            // Generate and download PDF
+            html2pdf().set(options).from(pdfElement).save().then(() => {
+                // Restore button state
+                exportPdfBtn.innerHTML = originalText;
+                exportPdfBtn.disabled = false;
+                
+                // Show success message
+                alert('PDF 報告已成功生成並下載！');
+            }).catch(err => {
+                // Restore button state
+                exportPdfBtn.innerHTML = originalText;
+                exportPdfBtn.disabled = false;
+                
+                // Show error message
+                alert('生成 PDF 時發生錯誤，請重試。');
+                console.error('PDF generation error:', err);
+            });
+        });
+    </script>
+</body></html>

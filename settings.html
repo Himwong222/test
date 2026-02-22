@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>系統設定 - 茶言觀色·客戶流失風險評估器</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6b8f24",
+                        "background-light": "#f7f8f6",
+                        "background-dark": "#1b1f13",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans", "Noto Sans TC", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Work Sans', 'Noto Sans TC', sans-serif; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
+    <header class="flex items-center justify-between border-b border-primary/10 bg-white dark:bg-background-dark px-6 py-3 sticky top-0">
+        <div class="flex items-center gap-4">
+            <div class="size-8 text-primary">
+                <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M24 4C25.7818 14.2173 33.7827 22.2182 44 24C33.7827 25.7818 25.7818 33.7827 24 44C22.2182 33.7827 14.2173 25.7818 4 24C14.2173 22.2182 22.2182 14.2173 24 4Z" fill="currentColor"></path>
+                </svg>
+            </div>
+            <h2 class="text-lg font-bold">茶言觀色·客戶流失風險評估器</h2>
+        </div>
+        <div class="flex items-center gap-4">
+            <button id="theme-toggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
+                <span id="theme-icon" class="material-symbols-outlined">dark_mode</span>
+            </button>
+            <nav class="hidden md:flex items-center gap-6">
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="index.html">主頁</a>
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="churn_risk_assessment_dashboard_1/code.html">雙語儀表板</a>
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="churn_risk_assessment_dashboard_3/code.html">中文儀表板</a>
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="customer_list.html">客戶列表</a>
+                <a class="text-slate-600 dark:text-slate-400 hover:text-primary" href="reports.html">數據報表</a>
+                <a class="text-primary border-b-2 border-primary pb-1" href="settings.html">系統設定</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="p-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="mb-8">
+                <h1 class="text-3xl font-black mb-2">系統設定</h1>
+                <p class="text-slate-600 dark:text-slate-400">管理應用程式設定、數據備份與系統偏好。</p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- General Settings -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined">settings</span>
+                        一般設定
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">深色模式</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">切換深色/淺色主題</p>
+                            </div>
+                            <button id="toggle-theme-btn" class="px-4 py-2 bg-primary text-white rounded-lg font-semibold">
+                                切換主題
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">語言設定</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">選擇介面顯示語言</p>
+                            </div>
+                            <select id="language-select" class="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <option value="zh-TW">繁體中文</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">時區設定</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">設定系統時區</p>
+                            </div>
+                            <select id="timezone-select" class="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700">
+                                <option value="Asia/Hong_Kong">香港時間 (UTC+8)</option>
+                                <option value="Asia/Taipei">台北時間 (UTC+8)</option>
+                                <option value="Asia/Shanghai">北京時間 (UTC+8)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Management -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined">database</span>
+                        數據管理
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">數據備份</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">備份所有客戶資料到本地檔案</p>
+                            </div>
+                            <button id="backup-data-btn" class="px-4 py-2 bg-primary text-white rounded-lg font-semibold flex items-center gap-2">
+                                <span class="material-symbols-outlined">backup</span>
+                                備份數據
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">數據還原</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">從備份檔案還原客戶資料</p>
+                            </div>
+                            <button id="restore-data-btn" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-semibold flex items-center gap-2">
+                                <span class="material-symbols-outlined">restore</span>
+                                還原數據
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">清除所有數據</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">刪除所有客戶資料（無法復原）</p>
+                            </div>
+                            <button id="clear-data-btn" class="px-4 py-2 bg-rose-100 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400 rounded-lg font-semibold flex items-center gap-2">
+                                <span class="material-symbols-outlined">delete_forever</span>
+                                清除數據
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Assessment Settings -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined">analytics</span>
+                        風險評估設定
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">基礎流失率</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">設定基礎流失率百分比</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="range" id="base-rate-slider" min="0" max="50" value="28" class="w-32">
+                                <span id="base-rate-value" class="font-bold text-primary w-12">28%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">高風險閾值</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">設定高風險的流失機率閾值</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="range" id="high-risk-slider" min="40" max="80" value="60" class="w-32">
+                                <span id="high-risk-value" class="font-bold text-rose-600 w-12">60%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">中風險閾值</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">設定中風險的流失機率閾值</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="range" id="medium-risk-slider" min="20" max="60" value="40" class="w-32">
+                                <span id="medium-risk-value" class="font-bold text-amber-600 w-12">40%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined">notifications</span>
+                        通知設定
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">高風險通知</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">當有高風險客戶時發送通知</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="high-risk-notification" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">數據更新通知</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">當數據有更新時發送通知</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="data-update-notification" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="font-medium">定期報告通知</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">每週發送統計報告通知</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="weekly-report-notification" class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Information -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined">info</span>
+                        系統資訊
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-slate-600 dark:text-slate-400">應用程式版本</span>
+                            <span class="font-medium">v1.2.0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600 dark:text-slate-400">最後更新時間</span>
+                            <span class="font-medium" id="last-updated-time">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600 dark:text-slate-400">客戶資料數量</span>
+                            <span class="font-medium" id="customer-count">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600 dark:text-slate-400">瀏覽器支援</span>
+                            <span class="font-medium">Chrome, Firefox, Edge</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600 dark:text-slate-400">數據儲存</span>
+                            <span class="font-medium">localStorage</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Settings -->
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-medium">儲存設定</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">套用所有變更的設定</p>
+                        </div>
+                        <button id="save-settings-btn" class="px-6 py-3 bg-primary text-white rounded-lg font-semibold flex items-center gap-2">
+                            <span class="material-symbols-outlined">save</span>
+                            儲存設定
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-background-dark text-slate-400 py-8 px-6 border-t border-primary/10">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="text-center md:text-left">
+                    <p class="text-sm">© 2025 茶言觀色·客戶流失風險評估器 v1.2.0</p>
+                    <p class="text-xs mt-1">系統設定與管理</p>
+                </div>
+                <div class="flex items-center gap-6">
+                    <a href="index.html" class="text-sm hover:text-primary">主頁</a>
+                    <a href="customer_list.html" class="text-sm hover:text-primary">客戶列表</a>
+                    <a href="reports.html" class="text-sm hover:text-primary">數據報表</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // Load saved theme
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            themeIcon.textContent = 'light_mode';
+        } else {
+            document.documentElement.classList.remove('dark');
+            themeIcon.textContent = 'dark_mode';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.textContent = 'light_mode';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.textContent = 'dark_mode';
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            updateSystemInfo();
+            setupEventListeners();
+        });
+
+        // Load Settings
+        function loadSettings() {
+            // Load saved settings from localStorage
+            const settings = JSON.parse(localStorage.getItem('settings')) || {};
+            
+            // Language
+            if (settings.language) {
+                document.getElementById('language-select').value = settings.language;
+            }
+            
+            // Timezone
+            if (settings.timezone) {
+                document.getElementById('timezone-select').value = settings.timezone;
+            }
+            
+            // Risk assessment settings
+            if (settings.baseRate !== undefined) {
+                document.getElementById('base-rate-slider').value = settings.baseRate;
+                document.getElementById('base-rate-value').textContent = settings.baseRate + '%';
+            }
+            
+            if (settings.highRiskThreshold !== undefined) {
+                document.getElementById('high-risk-slider').value = settings.highRiskThreshold;
+                document.getElementById('high-risk-value').textContent = settings.highRiskThreshold + '%';
+            }
+            
+            if (settings.mediumRiskThreshold !== undefined) {
+                document.getElementById('medium-risk-slider').value = settings.mediumRiskThreshold;
+                document.getElementById('medium-risk-value').textContent = settings.mediumRiskThreshold + '%';
+            }
+            
+            // Notification settings
+            if (settings.highRiskNotification !== undefined) {
+                document.getElementById('high-risk-notification').checked = settings.highRiskNotification;
+            }
+            
+            if (settings.dataUpdateNotification !== undefined) {
+                document.getElementById('data-update-notification').checked = settings.dataUpdateNotification;
+            }
+            
+            if (settings.weeklyReportNotification !== undefined) {
+                document.getElementById('weekly-report-notification').checked = settings.weeklyReportNotification;
+            }
+        }
+
+        // Update System Info
+        function updateSystemInfo() {
+            const customers = JSON.parse(localStorage.getItem('customers')) || [];
+            document.getElementById('customer-count').textContent = customers.length;
+            document.getElementById('last-updated-time').textContent = new Date().toLocaleString('zh-TW');
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Theme toggle button
+            document.getElementById('toggle-theme-btn').addEventListener('click', () => {
+                themeToggle.click();
+            });
+            
+            // Slider updates
+            document.getElementById('base-rate-slider').addEventListener('input', (e) => {
+                document.getElementById('base-rate-value').textContent = e.target.value + '%';
+            });
+            
+            document.getElementById('high-risk-slider').addEventListener('input', (e) => {
+                document.getElementById('high-risk-value').textContent = e.target.value + '%';
+            });
+            
+            document.getElementById('medium-risk-slider').addEventListener('input', (e) => {
+                document.getElementById('medium-risk-value').textContent = e.target.value + '%';
+            });
+            
+            // Data management buttons
+            document.getElementById('backup-data-btn').addEventListener('click', backupData);
+            document.getElementById('restore-data-btn').addEventListener('click', restoreData);
+            document.getElementById('clear-data-btn').addEventListener('click', clearData);
+            
+            // Save settings button
+            document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
+        }
+
+        // Backup Data
+        function backupData() {
+            const customers = JSON.parse(localStorage.getItem('customers')) || [];
+            const settings = JSON.parse(localStorage.getItem('settings')) || {};
+            
+            const backupData = {
+                customers: customers,
+                settings: settings,
+                backupDate: new Date().toISOString(),
+                version: '1.2.0'
+            };
+            
+            const dataStr = JSON.stringify(backupData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `客戶流失評估器_備份_${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            alert('數據備份成功！檔案已下載。');
+        }
+
+        // Restore Data
+        function restoreData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const backupData = JSON.parse(event.target.result);
+                        
+                        if (backupData.customers) {
+                            localStorage.setItem('customers', JSON.stringify(backupData.customers));
+                        }
+                        
+                        if (backupData.settings) {
+                            localStorage.setItem('settings', JSON.stringify(backupData.settings));
+                            loadSettings();
+                        }
+                        
+                        updateSystemInfo();
+                        alert('數據還原成功！');
+                    } catch (error) {
+                        alert('還原失敗：檔案格式錯誤');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        // Clear Data
+        function clearData() {
+            if (confirm('確定要清除所有客戶資料嗎？此操作無法復原！')) {
+                localStorage.removeItem('customers');
+                updateSystemInfo();
+                alert('所有客戶資料已清除。');
+            }
+        }
+
+        // Save Settings
+        function saveSettings() {
+            const settings = {
+                language: document.getElementById('language-select').value,
+                timezone: document.getElementById('timezone-select').value,
+                baseRate: parseInt(document.getElementById('base-rate-slider').value),
+                highRiskThreshold: parseInt(document.getElementById('high-risk-slider').value),
+                mediumRiskThreshold: parseInt(document.getElementById('medium-risk-slider').value),
+                highRiskNotification: document.getElementById('high-risk-notification').checked,
+                dataUpdateNotification: document.getElementById('data-update-notification').checked,
+                weeklyReportNotification: document.getElementById('weekly-report-notification').checked,
+                lastSaved: new Date().toISOString()
+            };
+            
+            localStorage.setItem('settings', JSON.stringify(settings));
+            
+            // Update risk assessment parameters in dashboards
+            updateRiskParameters(settings);
+            
+            alert('設定已儲存！');
+        }
+
+        // Update Risk Parameters
+        function updateRiskParameters(settings) {
+            // This function would update the risk calculation parameters
+            // in the dashboards if they were using centralized settings
+            console.log('Risk parameters updated:', settings);
+        }
+
+        // Auto-update system info every minute
+        setInterval(updateSystemInfo, 60000);
+    </script>
+</body>
+</html>
