@@ -86,6 +86,10 @@
                             <span class="material-symbols-outlined">download</span>
                             匯出 CSV
                         </button>
+                        <button id="test-add-btn" class="px-4 py-2 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 rounded-lg font-semibold flex items-center gap-2">
+                            <span class="material-symbols-outlined">add</span>
+                            測試新增
+                        </button>
                     </div>
                 </div>
             </div>
@@ -268,13 +272,61 @@
 
         // Customer Data Management
         let customers = JSON.parse(localStorage.getItem('customers')) || [];
+        let editingCustomerId = null;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            // Add sample customers if empty
+            if (customers.length === 0) {
+                addSampleCustomers();
+            }
             updateCustomerList();
             updateStats();
             setupEventListeners();
         });
+        
+        // Add Sample Customers
+        function addSampleCustomers() {
+            const sampleCustomers = [
+                {
+                    id: 'CUST-1001',
+                    name: '張小明',
+                    age: 28,
+                    monthlyVisits: 8,
+                    daysSinceLastVisit: 15,
+                    satisfaction: 8,
+                    probability: 42.3,
+                    riskLevel: 'medium',
+                    assessmentDate: '2025-02-20'
+                },
+                {
+                    id: 'CUST-1002',
+                    name: '李美華',
+                    age: 45,
+                    monthlyVisits: 4,
+                    daysSinceLastVisit: 60,
+                    satisfaction: 6,
+                    probability: 68.7,
+                    riskLevel: 'high',
+                    assessmentDate: '2025-02-21'
+                },
+                {
+                    id: 'CUST-1003',
+                    name: '王建國',
+                    age: 35,
+                    monthlyVisits: 12,
+                    daysSinceLastVisit: 7,
+                    satisfaction: 9,
+                    probability: 24.5,
+                    riskLevel: 'low',
+                    assessmentDate: '2025-02-22'
+                }
+            ];
+            
+            customers.push(...sampleCustomers);
+            localStorage.setItem('customers', JSON.stringify(customers));
+            console.log('Added sample customers:', sampleCustomers.length);
+        }
 
         // Setup Event Listeners
         function setupEventListeners() {
@@ -298,6 +350,9 @@
             
             // Export CSV
             document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
+            
+            // Test add multiple customers
+            document.getElementById('test-add-btn').addEventListener('click', testAddMultipleCustomers);
         }
 
         // Modal Functions
@@ -305,18 +360,23 @@
             document.getElementById('add-customer-modal').classList.remove('hidden');
             document.getElementById('customer-form').reset();
             document.getElementById('satisfaction-value').textContent = '5';
+            editingCustomerId = null;
+            document.getElementById('save-customer').textContent = '儲存客戶';
         }
 
         function closeModal() {
             document.getElementById('add-customer-modal').classList.add('hidden');
+            editingCustomerId = null;
         }
 
         // Save Customer
         function saveCustomer(e) {
             e.preventDefault();
             
-            const customer = {
-                id: 'CUST-' + Date.now().toString().slice(-6),
+            console.log('Saving customer, editingCustomerId:', editingCustomerId);
+            console.log('Current customers count:', customers.length);
+            
+            const customerData = {
                 name: document.getElementById('customer-name').value,
                 age: parseInt(document.getElementById('customer-age').value) || 30,
                 monthlyVisits: parseInt(document.getElementById('monthly-visits').value) || 4,
@@ -339,7 +399,27 @@
                 assessmentDate: new Date().toLocaleDateString('zh-TW')
             };
             
-            customers.push(customer);
+            if (editingCustomerId) {
+                // Update existing customer
+                const index = customers.findIndex(c => c.id === editingCustomerId);
+                console.log('Updating customer at index:', index);
+                if (index !== -1) {
+                    customers[index] = {
+                        ...customers[index],
+                        ...customerData
+                    };
+                }
+            } else {
+                // Add new customer
+                const customer = {
+                    id: 'CUST-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+                    ...customerData
+                };
+                console.log('Adding new customer with ID:', customer.id);
+                customers.push(customer);
+            }
+            
+            console.log('Customers after save:', customers.length);
             localStorage.setItem('customers', JSON.stringify(customers));
             
             closeModal();
@@ -379,6 +459,8 @@
 
         // Update Customer List
         function updateCustomerList() {
+            console.log('Updating customer list, total customers:', customers.length);
+            
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const riskFilter = document.getElementById('filter-risk').value;
             
@@ -387,6 +469,8 @@
                 const matchesRisk = riskFilter === 'all' || customer.riskLevel === riskFilter;
                 return matchesSearch && matchesRisk;
             });
+            
+            console.log('Filtered customers:', filteredCustomers.length);
             
             const tableBody = document.getElementById('customer-table-body');
             const emptyState = document.getElementById('empty-state');
@@ -509,10 +593,82 @@
             document.getElementById('satisfaction').value = customer.satisfaction;
             document.getElementById('satisfaction-value').textContent = customer.satisfaction;
             
-            openAddCustomerModal();
+            editingCustomerId = id;
+            document.getElementById('save-customer').textContent = '更新客戶';
+            document.getElementById('add-customer-modal').classList.remove('hidden');
+        }
+
+        // Test Add Multiple Customers
+        function testAddMultipleCustomers() {
+            console.log('Testing add multiple customers...');
             
-            // Remove old customer
-            customers = customers.filter(c => c.id !== id);
+            const testCustomers = [
+                {
+                    name: '測試客戶A',
+                    age: 25,
+                    monthlyVisits: 10,
+                    daysSinceLastVisit: 5,
+                    satisfaction: 8
+                },
+                {
+                    name: '測試客戶B',
+                    age: 40,
+                    monthlyVisits: 3,
+                    daysSinceLastVisit: 90,
+                    satisfaction: 4
+                },
+                {
+                    name: '測試客戶C',
+                    age: 32,
+                    monthlyVisits: 6,
+                    daysSinceLastVisit: 30,
+                    satisfaction: 7
+                },
+                {
+                    name: '測試客戶D',
+                    age: 55,
+                    monthlyVisits: 2,
+                    daysSinceLastVisit: 120,
+                    satisfaction: 3
+                },
+                {
+                    name: '測試客戶E',
+                    age: 28,
+                    monthlyVisits: 15,
+                    daysSinceLastVisit: 3,
+                    satisfaction: 9
+                }
+            ];
+            
+            testCustomers.forEach((data, index) => {
+                const probability = calculateChurnProbability(
+                    data.daysSinceLastVisit,
+                    data.satisfaction,
+                    data.monthlyVisits,
+                    data.age
+                );
+                
+                const customer = {
+                    id: 'TEST-' + Date.now() + '-' + index + '-' + Math.random().toString(36).substr(2, 4),
+                    name: data.name,
+                    age: data.age,
+                    monthlyVisits: data.monthlyVisits,
+                    daysSinceLastVisit: data.daysSinceLastVisit,
+                    satisfaction: data.satisfaction,
+                    probability: probability,
+                    riskLevel: getRiskLevel(probability),
+                    assessmentDate: new Date().toLocaleDateString('zh-TW')
+                };
+                
+                customers.push(customer);
+                console.log(`Added test customer ${index + 1}: ${customer.name}, Risk: ${customer.riskLevel}`);
+            });
+            
+            localStorage.setItem('customers', JSON.stringify(customers));
+            updateCustomerList();
+            updateStats();
+            
+            alert(`已成功新增 ${testCustomers.length} 筆測試客戶資料！`);
         }
 
         // Delete Customer
