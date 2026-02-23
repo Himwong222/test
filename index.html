@@ -73,6 +73,9 @@
             <button id="theme-toggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                 <span id="theme-icon" class="material-symbols-outlined text-[20px]">dark_mode</span>
             </button>
+            <button id="mobile-menu-toggle" class="md:hidden p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                <span class="material-symbols-outlined text-[20px]">menu</span>
+            </button>
             <nav class="hidden md:flex items-center gap-6">
                 <a class="text-primary text-sm font-semibold border-b-2 border-primary pb-1" href="#">主頁</a>
                 <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#features">功能特色</a>
@@ -82,6 +85,27 @@
                 <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="settings.html">系統設定</a>
                 <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#about">關於</a>
             </nav>
+        </div>
+        
+        <!-- Mobile Menu Drawer -->
+        <div id="mobile-menu" class="fixed inset-0 bg-black/50 z-50 hidden md:hidden">
+            <div class="absolute right-0 top-0 h-full w-64 bg-white dark:bg-background-dark shadow-xl">
+                <div class="p-4 border-b border-primary/10 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-primary">導航選單</h3>
+                    <button id="close-mobile-menu" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="p-4 space-y-4">
+                    <a class="block py-3 px-4 rounded-lg bg-primary/10 text-primary font-semibold" href="#">主頁</a>
+                    <a class="block py-3 px-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="#features">功能特色</a>
+                    <a class="block py-3 px-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="#dashboards">儀表板</a>
+                    <a class="block py-3 px-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="customer_list.html">客戶列表</a>
+                    <a class="block py-3 px-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="reports.html">數據報表</a>
+                    <a class="block py-3 px-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="settings.html">系統設定</a>
+                    <a class="block py-3 px-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="#about">關於</a>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -247,12 +271,15 @@
         </div>
     </footer>
 
-    <!-- JavaScript for Theme Toggle -->
+    <!-- JavaScript for Theme Toggle and Mobile Menu -->
     <script>
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMobileMenu = document.getElementById('close-mobile-menu');
         
-        // Check for saved theme preference or default to light
+        // Theme Toggle
         const savedTheme = localStorage.getItem('theme') || 'light';
         if (savedTheme === 'dark') {
             document.documentElement.classList.add('dark');
@@ -262,7 +289,6 @@
             themeIcon.textContent = 'dark_mode';
         }
         
-        // Toggle theme on button click
         themeToggle.addEventListener('click', () => {
             if (document.documentElement.classList.contains('dark')) {
                 document.documentElement.classList.remove('dark');
@@ -272,6 +298,63 @@
                 document.documentElement.classList.add('dark');
                 localStorage.setItem('theme', 'dark');
                 themeIcon.textContent = 'light_mode';
+            }
+        });
+        
+        // Mobile Menu Toggle
+        if (mobileMenuToggle && mobileMenu && closeMobileMenu) {
+            mobileMenuToggle.addEventListener('click', () => {
+                mobileMenu.classList.remove('hidden');
+            });
+            
+            closeMobileMenu.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+            
+            // Close menu when clicking outside
+            mobileMenu.addEventListener('click', (e) => {
+                if (e.target === mobileMenu) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+            
+            // Close menu when clicking on a link
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+        }
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Mobile-specific optimizations
+        document.addEventListener('DOMContentLoaded', () => {
+            // Increase touch target sizes on mobile
+            if ('ontouchstart' in window || navigator.maxTouchPoints) {
+                document.querySelectorAll('button, a').forEach(element => {
+                    element.classList.add('min-h-[44px]', 'min-w-[44px]');
+                });
+                
+                // Make form inputs more touch-friendly
+                document.querySelectorAll('input, select, textarea').forEach(input => {
+                    input.classList.add('text-base', 'py-3');
+                });
             }
         });
     </script>
