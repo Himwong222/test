@@ -53,6 +53,9 @@
 <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">Tea Observation Churn Risk Assessor</h2>
 </div>
 <div class="flex flex-1 justify-end gap-8 items-center">
+<button id="mobile-menu-toggle" class="md:hidden p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[20px]">menu</span>
+</button>
 <nav class="hidden md:flex items-center gap-9">
 <a class="text-primary text-sm font-semibold border-b-2 border-primary pb-1" href="#">Dashboard</a>
 <a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="../customer_list.html">Customer List</a>
@@ -63,11 +66,30 @@
 <img class="w-full h-full object-cover" data-alt="Manager profile photo avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3d8m8dPDzV7Y5d1-uypWlkxkS-RvhCyStxYmPi91OYaogS2Ct5oWNN9kU91Ze4sHPA2owB96TZ9WQRz3dFvm13e-dohWxRG7RIdFcmxHycBiM_6TX2LKe9gIojrPazuUiQeyNALd4LLiimQH1RaZPNyIOAuGcxpzRbKaV90PZnbUaHss4o7BD9KeHkghrBOIZ5J-ZZCqdn4mJrWFV-D88P2CGsu9a1koNlDkuupHxc8mcSE7tqn8jQxz32BXrzVjJXEfVT_nzDt4"/>
 </div>
 </div>
+
+<!-- Mobile Menu Drawer -->
+<div id="mobile-menu" class="fixed inset-0 bg-black/50 z-50 hidden md:hidden">
+<div class="absolute right-0 top-0 h-full w-64 bg-white dark:bg-background-dark shadow-xl">
+<div class="p-4 border-b border-primary/10 flex justify-between items-center">
+<h3 class="text-lg font-bold text-primary">Navigation</h3>
+<button id="close-mobile-menu" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-4 space-y-4">
+<a class="block py-3 px-4 rounded-lg bg-primary/10 text-primary font-semibold" href="#">Dashboard</a>
+<a class="block py-3 px-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="../customer_list.html">Customer List</a>
+<a class="block py-3 px-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="../reports.html">Reports</a>
+<a class="block py-3 px-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="../settings.html">Settings</a>
+<a class="block py-3 px-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="../index.html">Home</a>
+</div>
+</div>
+</div>
 </header>
 <!-- Main Content Layout -->
-<main class="flex flex-1 overflow-hidden h-[calc(100vh-65px)]">
+<main class="flex flex-col md:flex-row flex-1 overflow-hidden h-[calc(100vh-65px)]">
 <!-- Left Sidebar: Input Form -->
-<aside class="w-[400px] border-r border-primary/10 bg-white/50 dark:bg-background-dark/50 overflow-y-auto p-6 scrollbar-hide">
+<aside class="w-full md:w-[400px] border-r border-primary/10 bg-white/50 dark:bg-background-dark/50 overflow-y-auto p-4 md:p-6 scrollbar-hide">
 <div class="flex flex-col gap-6">
 <div>
 <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Customer Profile</h1>
@@ -125,9 +147,9 @@
 </div>
 </aside>
 <!-- Right Panel: Results Section -->
-<section class="flex-1 bg-tea-texture overflow-y-auto p-8 lg:p-12 relative">
+<section class="flex-1 bg-tea-texture overflow-y-auto p-4 md:p-8 lg:p-12 relative">
 <!-- Result Visibility Wrapper (Visible State) -->
-<div class="max-w-4xl mx-auto flex flex-col gap-10">
+<div class="max-w-4xl mx-auto flex flex-col gap-6 md:gap-10">
 <!-- Results Header -->
 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
 <div>
@@ -278,8 +300,59 @@
 </svg>
 </div>
 
-    <!-- JavaScript for Churn Risk Assessment -->
+    <!-- JavaScript for Churn Risk Assessment and Mobile Menu -->
     <script>
+        // Mobile Menu Functionality
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMobileMenu = document.getElementById('close-mobile-menu');
+        
+        if (mobileMenuToggle && mobileMenu && closeMobileMenu) {
+            mobileMenuToggle.addEventListener('click', () => {
+                mobileMenu.classList.remove('hidden');
+            });
+            
+            closeMobileMenu.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+            
+            // Close menu when clicking outside
+            mobileMenu.addEventListener('click', (e) => {
+                if (e.target === mobileMenu) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+            
+            // Close menu when clicking on a link
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+        }
+        
+        // Mobile-specific optimizations
+        document.addEventListener('DOMContentLoaded', () => {
+            // Increase touch target sizes on mobile
+            if ('ontouchstart' in window || navigator.maxTouchPoints) {
+                document.querySelectorAll('button, a').forEach(element => {
+                    element.classList.add('min-h-[44px]', 'min-w-[44px]');
+                });
+                
+                // Make form inputs more touch-friendly
+                document.querySelectorAll('input, select, textarea').forEach(input => {
+                    input.classList.add('text-base', 'py-3');
+                });
+                
+                // Adjust sidebar height on mobile
+                const sidebar = document.querySelector('aside');
+                if (sidebar && window.innerWidth < 768) {
+                    sidebar.style.maxHeight = '60vh';
+                    sidebar.style.overflowY = 'auto';
+                }
+            }
+        });
+        
         // Satisfaction score buttons
         const satisfactionButtons = document.querySelectorAll('.satisfaction-btn');
         const satisfactionInput = document.getElementById('satisfaction-input');
