@@ -199,7 +199,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium mb-2">客戶名稱 *</label>
-                            <input type="text" id="customer-name" required class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700" placeholder="輸入客戶姓名">
+                            <input type="text" id="customer-name" class="w-full px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700" placeholder="輸入客戶姓名">
                         </div>
                         <div>
                             <label class="block text-sm font-medium mb-2">年齡</label>
@@ -426,60 +426,84 @@
 
         // Save Customer
         function saveCustomer(e) {
-            e.preventDefault();
-            
-            console.log('Saving customer, editingCustomerId:', editingCustomerId);
-            console.log('Current customers count:', customers.length);
-            
-            const customerData = {
-                name: document.getElementById('customer-name').value,
-                age: parseInt(document.getElementById('customer-age').value) || 30,
-                monthlyVisits: parseInt(document.getElementById('monthly-visits').value) || 4,
-                daysSinceLastVisit: parseInt(document.getElementById('days-since-last-visit').value) || 7,
-                satisfaction: parseInt(document.getElementById('satisfaction').value) || 5,
-                probability: calculateChurnProbability(
-                    parseInt(document.getElementById('days-since-last-visit').value) || 7,
-                    parseInt(document.getElementById('satisfaction').value) || 5,
-                    parseInt(document.getElementById('monthly-visits').value) || 4,
-                    parseInt(document.getElementById('customer-age').value) || 30
-                ),
-                riskLevel: getRiskLevel(
-                    calculateChurnProbability(
-                        parseInt(document.getElementById('days-since-last-visit').value) || 7,
-                        parseInt(document.getElementById('satisfaction').value) || 5,
-                        parseInt(document.getElementById('monthly-visits').value) || 4,
-                        parseInt(document.getElementById('customer-age').value) || 30
-                    )
-                ),
-                assessmentDate: new Date().toLocaleDateString('zh-TW')
-            };
-            
-            if (editingCustomerId) {
-                // Update existing customer
-                const index = customers.findIndex(c => c.id === editingCustomerId);
-                console.log('Updating customer at index:', index);
-                if (index !== -1) {
-                    customers[index] = {
-                        ...customers[index],
+            try {
+                e.preventDefault();
+                
+                console.log('Saving customer, editingCustomerId:', editingCustomerId);
+                console.log('Current customers count:', customers.length);
+                
+                // 獲取表單數據
+                const name = document.getElementById('customer-name').value.trim();
+                const age = parseInt(document.getElementById('customer-age').value) || 30;
+                const monthlyVisits = parseInt(document.getElementById('monthly-visits').value) || 4;
+                const daysSinceLastVisit = parseInt(document.getElementById('days-since-last-visit').value) || 7;
+                const satisfaction = parseInt(document.getElementById('satisfaction').value) || 5;
+                
+                // 驗證必要字段
+                if (!name) {
+                    alert('請輸入客戶名稱');
+                    document.getElementById('customer-name').focus();
+                    return;
+                }
+                
+                // 計算流失概率和風險等級
+                const probability = calculateChurnProbability(daysSinceLastVisit, satisfaction, monthlyVisits, age);
+                const riskLevel = getRiskLevel(probability);
+                
+                const customerData = {
+                    name: name,
+                    age: age,
+                    monthlyVisits: monthlyVisits,
+                    daysSinceLastVisit: daysSinceLastVisit,
+                    satisfaction: satisfaction,
+                    probability: probability,
+                    riskLevel: riskLevel,
+                    assessmentDate: new Date().toLocaleDateString('zh-TW')
+                };
+                
+                console.log('Customer data to save:', customerData);
+                
+                if (editingCustomerId) {
+                    // Update existing customer
+                    const index = customers.findIndex(c => c.id === editingCustomerId);
+                    console.log('Updating customer at index:', index);
+                    if (index !== -1) {
+                        customers[index] = {
+                            ...customers[index],
+                            ...customerData
+                        };
+                        console.log('Customer updated successfully');
+                    }
+                } else {
+                    // Add new customer
+                    const customer = {
+                        id: 'CUST-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9) + '-' + customers.length,
                         ...customerData
                     };
+                    console.log('Adding new customer with ID:', customer.id);
+                    customers.push(customer);
+                    console.log('Customer added successfully');
                 }
-            } else {
-                // Add new customer
-                const customer = {
-                    id: 'CUST-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9) + '-' + customers.length,
-                    ...customerData
-                };
-                console.log('Adding new customer with ID:', customer.id);
-                customers.push(customer);
+                
+                console.log('Customers after save:', customers.length);
+                localStorage.setItem('customers', JSON.stringify(customers));
+                console.log('Data saved to localStorage');
+                
+                closeModal();
+                updateCustomerList();
+                updateStats();
+                
+                console.log('UI updated successfully');
+                
+                // 顯示成功消息
+                setTimeout(() => {
+                    alert('客戶資料已成功儲存！');
+                }, 100);
+                
+            } catch (error) {
+                console.error('Error saving customer:', error);
+                alert('儲存客戶時發生錯誤: ' + error.message);
             }
-            
-            console.log('Customers after save:', customers.length);
-            localStorage.setItem('customers', JSON.stringify(customers));
-            
-            closeModal();
-            updateCustomerList();
-            updateStats();
         }
 
         // Calculate Churn Probability
