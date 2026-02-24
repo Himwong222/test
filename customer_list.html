@@ -90,6 +90,10 @@
                             <span class="material-symbols-outlined">add</span>
                             測試新增
                         </button>
+                        <button id="clear-all-btn" class="px-4 py-2 bg-rose-100 dark:bg-rose-900 text-rose-700 dark:text-rose-300 rounded-lg font-semibold flex items-center gap-2">
+                            <span class="material-symbols-outlined">delete_forever</span>
+                            清除所有
+                        </button>
                     </div>
                 </div>
             </div>
@@ -276,13 +280,14 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            // Add sample customers if empty
-            if (customers.length === 0) {
-                addSampleCustomers();
-            }
             updateCustomerList();
             updateStats();
             setupEventListeners();
+            
+            // Show welcome message if no customers
+            if (customers.length === 0) {
+                console.log('No customers found. User can add their own or use test button.');
+            }
         });
         
         // Add Sample Customers
@@ -330,14 +335,41 @@
 
         // Setup Event Listeners
         function setupEventListeners() {
+            console.log('Setting up event listeners...');
+            
             // Modal buttons
-            document.getElementById('add-customer-btn').addEventListener('click', openAddCustomerModal);
-            document.getElementById('add-first-customer').addEventListener('click', openAddCustomerModal);
-            document.getElementById('close-modal').addEventListener('click', closeModal);
-            document.getElementById('cancel-modal').addEventListener('click', closeModal);
+            const addCustomerBtn = document.getElementById('add-customer-btn');
+            const addFirstCustomer = document.getElementById('add-first-customer');
+            const closeModalBtn = document.getElementById('close-modal');
+            const cancelModalBtn = document.getElementById('cancel-modal');
+            
+            console.log('Buttons found:', {
+                addCustomerBtn: !!addCustomerBtn,
+                addFirstCustomer: !!addFirstCustomer,
+                closeModalBtn: !!closeModalBtn,
+                cancelModalBtn: !!cancelModalBtn
+            });
+            
+            if (addCustomerBtn) {
+                addCustomerBtn.addEventListener('click', openAddCustomerModal);
+            }
+            if (addFirstCustomer) {
+                addFirstCustomer.addEventListener('click', openAddCustomerModal);
+            }
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', closeModal);
+                console.log('Close modal button event listener added');
+            }
+            if (cancelModalBtn) {
+                cancelModalBtn.addEventListener('click', closeModal);
+                console.log('Cancel modal button event listener added');
+            }
             
             // Form submission
-            document.getElementById('customer-form').addEventListener('submit', saveCustomer);
+            const customerForm = document.getElementById('customer-form');
+            if (customerForm) {
+                customerForm.addEventListener('submit', saveCustomer);
+            }
             
             // Search and filter
             document.getElementById('search-input').addEventListener('input', updateCustomerList);
@@ -352,7 +384,29 @@
             document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
             
             // Test add multiple customers
-            document.getElementById('test-add-btn').addEventListener('click', testAddMultipleCustomers);
+            const testAddBtn = document.getElementById('test-add-btn');
+            if (testAddBtn) {
+                testAddBtn.addEventListener('click', testAddMultipleCustomers);
+            }
+            
+            // Clear all data
+            const clearAllBtn = document.getElementById('clear-all-btn');
+            if (clearAllBtn) {
+                clearAllBtn.addEventListener('click', clearAllData);
+            }
+            
+            // Click outside to close modal
+            const modal = document.getElementById('add-customer-modal');
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeModal();
+                    }
+                });
+                console.log('Click-outside-to-close event listener added');
+            }
+            
+            console.log('Event listeners setup complete');
         }
 
         // Modal Functions
@@ -368,6 +422,7 @@
             document.getElementById('add-customer-modal').classList.add('hidden');
             editingCustomerId = null;
         }
+        
 
         // Save Customer
         function saveCustomer(e) {
@@ -412,7 +467,7 @@
             } else {
                 // Add new customer
                 const customer = {
-                    id: 'CUST-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+                    id: 'CUST-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9) + '-' + customers.length,
                     ...customerData
                 };
                 console.log('Adding new customer with ID:', customer.id);
@@ -464,13 +519,19 @@
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const riskFilter = document.getElementById('filter-risk').value;
             
+            console.log('Filter settings - Search:', searchTerm, 'Risk filter:', riskFilter);
+            
             let filteredCustomers = customers.filter(customer => {
                 const matchesSearch = customer.name.toLowerCase().includes(searchTerm);
                 const matchesRisk = riskFilter === 'all' || customer.riskLevel === riskFilter;
+                
+                console.log(`Customer: ${customer.name}, Risk: ${customer.riskLevel}, matchesSearch: ${matchesSearch}, matchesRisk: ${matchesRisk}`);
+                
                 return matchesSearch && matchesRisk;
             });
             
             console.log('Filtered customers:', filteredCustomers.length);
+            console.log('Filtered customer names:', filteredCustomers.map(c => c.name));
             
             const tableBody = document.getElementById('customer-table-body');
             const emptyState = document.getElementById('empty-state');
@@ -678,6 +739,17 @@
                 localStorage.setItem('customers', JSON.stringify(customers));
                 updateCustomerList();
                 updateStats();
+            }
+        }
+
+        // Clear All Data
+        function clearAllData() {
+            if (confirm('確定要清除所有客戶資料嗎？此操作無法復原！')) {
+                customers = [];
+                localStorage.removeItem('customers');
+                updateCustomerList();
+                updateStats();
+                alert('所有客戶資料已清除！');
             }
         }
     </script>
