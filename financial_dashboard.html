@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>財務儀表板 - 茶言觀色</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6b8f24',
+                        'primary-light': '#8db446',
+                        'primary-dark': '#4a6c0f',
+                        'secondary': '#2c5282',
+                        'accent': '#d69e2e',
+                        'success': '#38a169',
+                        'warning': '#d69e2e',
+                        'danger': '#e53e3e',
+                        'background-light': '#f8fafc',
+                        'background-dark': '#0f172a',
+                        'tea-texture': 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'
+                    },
+                    fontFamily: {
+                        'display': ['Inter', 'Noto Sans TC', 'sans-serif'],
+                        'body': ['Inter', 'Noto Sans TC', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .bg-tea-texture {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        .dark .bg-tea-texture {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
+    <header class="flex items-center justify-between border-b border-primary/10 bg-white dark:bg-background-dark px-6 py-3 sticky top-0">
+        <div class="flex items-center gap-4 text-primary">
+            <span class="material-symbols-outlined text-3xl">monitoring</span>
+            <div>
+                <h1 class="text-xl font-bold">茶言觀色</h1>
+                <p class="text-xs opacity-75">財務分析儀表板</p>
+            </div>
+        </div>
+        <nav class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-slate-600 dark:text-slate-300 hover:text-primary">首頁</a>
+            <a href="customer_list.html" class="text-slate-600 dark:text-slate-300 hover:text-primary">客戶列表</a>
+            <a href="reports.html" class="text-slate-600 dark:text-slate-300 hover:text-primary">數據報表</a>
+            <a href="financial_dashboard.html" class="text-primary font-semibold border-b-2 border-primary">財務儀表板</a>
+            <a href="settings.html" class="text-slate-600 dark:text-slate-300 hover:text-primary">系統設定</a>
+        </nav>
+    </header>
+
+    <main class="p-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-8">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2">財務分析儀表板</h2>
+                <p class="text-slate-600 dark:text-slate-400">專為財務部門設計的收入、成本與利潤分析工具</p>
+            </div>
+            
+            <!-- 財務KPI -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/5 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <p class="text-sm text-slate-500">總收入</p>
+                            <h3 class="text-2xl font-bold" id="total-revenue">$ 1,245,800</h3>
+                        </div>
+                        <span class="material-symbols-outlined text-green-500">trending_up</span>
+                    </div>
+                    <p class="text-sm text-green-600">+12.5% 較上月</p>
+                </div>
+                
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/5 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <p class="text-sm text-slate-500">總成本</p>
+                            <h3 class="text-2xl font-bold" id="total-cost">$ 892,400</h3>
+                        </div>
+                        <span class="material-symbols-outlined text-amber-500">account_balance</span>
+                    </div>
+                    <p class="text-sm text-amber-600">+8.2% 較上月</p>
+                </div>
+                
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/5 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <p class="text-sm text-slate-500">淨利潤</p>
+                            <h3 class="text-2xl font-bold" id="net-profit">$ 353,400</h3>
+                        </div>
+                        <span class="material-symbols-outlined text-blue-500">show_chart</span>
+                    </div>
+                    <p class="text-sm text-blue-600">+24.3% 較上月</p>
+                </div>
+                
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/5 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <p class="text-sm text-slate-500">利潤率</p>
+                            <h3 class="text-2xl font-bold" id="profit-margin">28.4%</h3>
+                        </div>
+                        <span class="material-symbols-outlined text-purple-500">percent</span>
+                    </div>
+                    <p class="text-sm text-purple-600">+2.8% 較上月</p>
+                </div>
+            </div>
+            
+            <!-- 圖表區 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/5">
+                    <h3 class="text-xl font-bold mb-4">收入與成本趨勢</h3>
+                    <div class="h-64">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/5">
+                    <h3 class="text-xl font-bold mb-4">利潤率分析</h3>
+                    <div class="h-64">
+                        <canvas id="profitChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 財務數據表格 -->
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/5">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold">詳細財務數據</h3>
+                    <button class="px-4 py-2 bg-primary text-white rounded-lg font-medium" id="export-btn">
+                        <span class="material-symbols-outlined">download</span>
+                        匯出報告
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-slate-50 dark:bg-slate-800">
+                            <tr>
+                                <th class="p-4 text-left">月份</th>
+                                <th class="p-4 text-left">收入</th>
+                                <th class="p-4 text-left">成本</th>
+                                <th class="p-4 text-left">利潤</th>
+                                <th class="p-4 text-left">利潤率</th>
+                            </tr>
+                        </thead>
+                        <tbody id="finance-table">
+                            <!-- 數據由JS生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-background-dark text-slate-400 py-8 px-6 border-t border-primary/10">
+        <div class="max-w-7xl mx-auto text-center">
+            <p>© 2024 茶言觀色財務分析系統 - 專為財務部門設計</p>
+        </div>
+    </footer>
+
+    <script>
+        // 財務數據
+        const financeData = [
+            { month: '1月', revenue: 980000, cost: 720000, profit: 260000, margin: 26.5 },
+            { month: '2月', revenue: 1020000, cost: 750000, profit: 270000, margin: 26.5 },
+            { month: '3月', revenue: 1100000, cost: 780000, profit: 320000, margin: 29.1 },
+            { month: '4月', revenue: 1150000, cost: 820000, profit: 330000, margin: 28.7 },
+            { month: '5月', revenue: 1180000, cost: 850000, profit: 330000, margin: 28.0 },
+            { month: '6月', revenue: 1200000, cost: 860000, profit: 340000, margin: 28.3 },
+            { month: '7月', revenue: 1220000, cost: 870000, profit: 350000, margin: 28.7 },
+            { month: '8月', revenue: 1240000, cost: 880000, profit: 360000, margin: 29.0 },
+            { month: '9月', revenue: 1250000, cost: 890000, profit: 360000, margin: 28.8 },
+            { month: '10月', revenue: 1260000, cost: 900000, profit: 360000, margin: 28.6 },
+            { month: '11月', revenue: 1240000, cost: 890000, profit: 350000, margin: 28.2 },
+            { month: '12月', revenue: 1245800, cost: 892400, profit: 353400, margin: 28.4 }
+        ];
+        
+        // 更新表格
+        function updateFinanceTable() {
+            const table = document.getElementById('finance-table');
+            table.innerHTML = '';
+            
+            financeData.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-slate-100 dark:border-slate-800';
+                row.innerHTML = `
+                    <td class="p-4">${item.month}</td>
+                    <td class="p-4">$ ${item.revenue.toLocaleString()}</td>
+                    <td class="p-4">$ ${item.cost.toLocaleString()}</td>
+                    <td class="p-4 font-semibold">$ ${item.profit.toLocaleString()}</td>
+                    <td class="p-4 ${item.margin >= 28 ? 'text-green-600' : 'text-amber-600'}">${item.margin}%</td>
+                `;
+                table.appendChild(row);
+            });
+        }
+        
+        // 初始化圖表
+        function initCharts() {
+            const months = financeData.map(d => d.month);
+            const revenues = financeData.map(d => d.revenue / 1000);
+            const costs = financeData.map(d => d.cost / 1000);
+            const profits = financeData.map(d => d.profit / 1000);
+            const margins = financeData.map(d => d.margin);
+            
+            // 收入成本圖
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: '收入 (千元)',
+                            data: revenues,
+                            borderColor: '#6b8f24',
+                            backgroundColor: 'rgba(107, 143, 36, 0.1)',
+                            fill: true
+                        },
+                        {
+                            label: '成本 (千元)',
+                            data: costs,
+                            borderColor: '#d69e2e',
+                            backgroundColor: 'rgba(214, 158, 46, 0.1)',
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // 利潤率圖
+            const profitCtx = document.getElementById('profitChart').getContext('2d');
+            new Chart(profitCtx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: '利潤率 (%)',
+                        data: margins,
+                        backgroundColor: margins.map(m => m >= 28 ? '#6b8f24' : '#d69e2e')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 35
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 匯出功能
+        document.getElementById('export-btn').addEventListener('click', () => {
+            exportFinancialReport();
+        });
+        
+        // 財務報告匯出函數
+        function exportFinancialReport() {
+            const now = new Date();
+            const element = document.createElement('div');
+            element.style.padding = '20px';
+            element.style.backgroundColor = 'white';
+            element.style.color = '#333';
+            element.style.fontFamily = "'Noto Sans TC', 'Inter', sans-serif";
+            
+            // 獲取當前財務數據 - 使用正確的ID
+            const revenue = document.querySelector('#total-revenue').textContent;
+            const cost = document.querySelector('#total-cost').textContent;
+            const profit = document.querySelector('#net-profit').textContent;
+            const margin = document.querySelector('#profit-margin').textContent;
+            
+            element.innerHTML = `
+                <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #6b8f24; padding-bottom: 20px;">
+                    <h1 style="color: #6b8f24; font-size: 28px; margin-bottom: 10px;">茶言觀色·財務分析報告</h1>
+                    <p style="color: #666; font-size: 16px;">生成時間: ${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}</p>
+                </div>
+                
+                <div style="margin-bottom: 30px;">
+                    <h2 style="color: #333; font-size: 22px; margin-bottom: 20px;">財務概覽</h2>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+                            <h3 style="color: #6b8f24; font-size: 18px; margin-bottom: 10px;">收入</h3>
+                            <p style="color: #333; font-size: 24px; font-weight: bold;">${revenue}</p>
+                            <p style="color: #666; font-size: 14px;">較上月增長 3.2%</p>
+                        </div>
+                        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+                            <h3 style="color: #d69e2e; font-size: 18px; margin-bottom: 10px;">成本</h3>
+                            <p style="color: #333; font-size: 24px; font-weight: bold;">${cost}</p>
+                            <p style="color: #666; font-size: 14px;">較上月增長 2.1%</p>
+                        </div>
+                        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+                            <h3 style="color: #38a169; font-size: 18px; margin-bottom: 10px;">利潤</h3>
+                            <p style="color: #333; font-size: 24px; font-weight: bold;">${profit}</p>
+                            <p style="color: #666; font-size: 14px;">較上月增長 5.8%</p>
+                        </div>
+                        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+                            <h3 style="color: #2c5282; font-size: 18px; margin-bottom: 10px;">利潤率</h3>
+                            <p style="color: #333; font-size: 24px; font-weight: bold;">${margin}</p>
+                            <p style="color: #666; font-size: 14px;">較上月增長 0.4%</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 30px;">
+                    <h2 style="color: #333; font-size: 22px; margin-bottom: 20px;">財務趨勢分析</h2>
+                    <p style="color: #555; font-size: 16px; line-height: 1.6;">
+                        根據過去12個月的財務數據分析，收入呈現穩定增長趨勢，平均月增長率為2.8%。成本控制良好，利潤率保持在28%以上，顯示出良好的經營效率。
+                    </p>
+                </div>
+                
+                <div style="margin-bottom: 30px;">
+                    <h2 style="color: #333; font-size: 22px; margin-bottom: 20px;">關鍵發現</h2>
+                    <ul style="color: #555; font-size: 16px; line-height: 1.6; padding-left: 20px;">
+                        <li>收入增長主要來自新店擴張和線上銷售渠道</li>
+                        <li>成本控制得當，原材料採購成本下降2.3%</li>
+                        <li>利潤率達到行業領先水平，顯示出良好的定價策略</li>
+                        <li>現金流充足，財務狀況穩健</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-bottom: 30px;">
+                    <h2 style="color: #333; font-size: 22px; margin-bottom: 20px;">建議措施</h2>
+                    <ul style="color: #555; font-size: 16px; line-height: 1.6; padding-left: 20px;">
+                        <li>繼續擴大線上銷售渠道，目標增加15%線上收入</li>
+                        <li>優化供應鏈管理，進一步降低採購成本</li>
+                        <li>考慮投資自動化設備，降低人力成本</li>
+                        <li>加強財務風險管理，建立應急資金儲備</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; font-size: 12px;">
+                    <p>茶言觀色·財務儀表板 v1.0 • 基於12個月財務數據分析</p>
+                    <p>數據更新時間: ${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 • 報告編號: FIN-${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}</p>
+                </div>
+            `;
+            
+            // 生成PDF
+            const options = {
+                margin: [10, 10, 10, 10],
+                filename: `Financial_Report_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait'
+                }
+            };
+            
+            html2pdf().set(options).from(element).save();
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            updateFinanceTable();
+            initCharts();
+        });
+    </script>
+</body>
+</html>

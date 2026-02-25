@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測試財務報告匯出</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <h1>測試財務報告PDF匯出功能</h1>
+    
+    <div id="test-content" style="padding: 20px; background-color: #f5f5f5;">
+        <h2>測試財務數據</h2>
+        <p>收入: <span id="total-revenue">$ 1,245,800</span></p>
+        <p>成本: <span id="total-cost">$ 892,400</span></p>
+        <p>利潤: <span id="net-profit">$ 353,400</span></p>
+        <p>利潤率: <span id="profit-margin">28.4%</span></p>
+    </div>
+    
+    <button id="test-export-btn" style="padding: 10px 20px; margin: 20px; font-size: 16px;">
+        測試匯出PDF
+    </button>
+    
+    <div id="result" style="margin: 20px; padding: 10px; border: 1px solid #ccc;"></div>
+    
+    <script>
+        document.getElementById('test-export-btn').addEventListener('click', function() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>正在生成PDF...</p>';
+            
+            try {
+                // 獲取當前財務數據
+                const revenue = document.querySelector('#total-revenue').textContent;
+                const cost = document.querySelector('#total-cost').textContent;
+                const profit = document.querySelector('#net-profit').textContent;
+                const margin = document.querySelector('#profit-margin').textContent;
+                
+                const now = new Date();
+                const element = document.createElement('div');
+                element.style.padding = '20px';
+                element.style.backgroundColor = 'white';
+                element.style.color = '#333';
+                
+                element.innerHTML = `
+                    <h1>測試財務報告</h1>
+                    <p>生成時間: ${now.toLocaleString()}</p>
+                    <p>收入: ${revenue}</p>
+                    <p>成本: ${cost}</p>
+                    <p>利潤: ${profit}</p>
+                    <p>利潤率: ${margin}</p>
+                    <p>這是一個測試PDF文件，用於驗證匯出功能是否正常工作。</p>
+                `;
+                
+                const options = {
+                    margin: [10, 10, 10, 10],
+                    filename: `Test_Financial_Report_${now.getTime()}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                
+                html2pdf().set(options).from(element).save().then(() => {
+                    resultDiv.innerHTML = '<p style="color: green;">✓ PDF匯出成功！請檢查下載文件。</p>';
+                }).catch(error => {
+                    resultDiv.innerHTML = `<p style="color: red;">✗ PDF匯出失敗: ${error.message}</p>`;
+                    console.error('PDF匯出錯誤:', error);
+                });
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">✗ 發生錯誤: ${error.message}</p>`;
+                console.error('錯誤:', error);
+            }
+        });
+    </script>
+</body>
+</html>
