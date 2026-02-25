@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專業財務報表測試</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Noto Sans TC', 'Inter', sans-serif; padding: 20px; }
+        .test-container { max-width: 800px; margin: 0 auto; }
+        .test-btn { padding: 12px 24px; background: #2c5282; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        .test-btn:hover { background: #1a365d; }
+        .result { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>專業財務報表PDF匯出測試</h1>
+        <p>此測試展示常規財務報表格式，包括損益表、財務比率分析和現金流分析。</p>
+        
+        <button class="test-btn" id="export-test-btn">匯出專業財務報表PDF</button>
+        
+        <div id="test-result" class="result"></div>
+        
+        <div id="report-preview" style="display: none;">
+            <!-- 這裡將動態生成報表內容 -->
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('export-test-btn').addEventListener('click', function() {
+            const resultDiv = document.getElementById('test-result');
+            resultDiv.innerHTML = '<p>正在生成專業財務報表PDF...</p>';
+            
+            try {
+                const now = new Date();
+                const element = document.createElement('div');
+                element.style.padding = '25px';
+                element.style.backgroundColor = 'white';
+                element.style.color = '#333';
+                element.style.fontFamily = "'Noto Sans TC', 'Inter', sans-serif";
+                element.style.fontSize = '14px';
+                
+                // 模擬財務數據
+                const revenue = "$ 1,245,800";
+                const cost = "$ 892,400";
+                const profit = "$ 353,400";
+                const margin = "28.4%";
+                
+                // 解析數值用於計算
+                const revenueValue = 1245800;
+                const costValue = 892400;
+                const profitValue = 353400;
+                
+                // 計算百分比
+                const costPercentage = ((costValue / revenueValue) * 100).toFixed(1);
+                const profitPercentage = ((profitValue / revenueValue) * 100).toFixed(1);
+                const grossMargin = (100 - parseFloat(costPercentage)).toFixed(1);
+                
+                element.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #2c5282; padding-bottom: 20px;">
+                        <h1 style="color: #2c5282; font-size: 28px; margin-bottom: 5px; font-weight: bold;">茶言觀色有限公司</h1>
+                        <h2 style="color: #333; font-size: 22px; margin-bottom: 10px;">財務報表</h2>
+                        <p style="color: #666; font-size: 16px; margin-bottom: 5px;">報告期間: ${now.getFullYear()}年${now.getMonth()+1}月</p>
+                        <p style="color: #666; font-size: 14px;">生成日期: ${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日</p>
+                    </div>
+                    
+                    <!-- 損益表 -->
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #2c5282; font-size: 20px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #2c5282;">損益表 (Income Statement)</h3>
+                        
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                            <thead>
+                                <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                                    <th style="text-align: left; padding: 12px 15px; font-weight: bold; color: #4a5568;">項目</th>
+                                    <th style="text-align: right; padding: 12px 15px; font-weight: bold; color: #4a5568;">金額</th>
+                                    <th style="text-align: right; padding: 12px 15px; font-weight: bold; color: #4a5568;">百分比</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 12px 15px; font-weight: bold; color: #2d3748;">營業收入</td>
+                                    <td style="padding: 12px 15px; text-align: right; font-weight: bold; color: #2d3748;">${revenue}</td>
+                                    <td style="padding: 12px 15px; text-align: right; color: #4a5568;">100.0%</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 12px 15px; padding-left: 30px; color: #4a5568;">&nbsp;&nbsp;• 產品銷售收入</td>
+                                    <td style="padding: 12px 15px; text-align: right; color: #4a5568;">$ 895,200</td>
+                                    <td style="padding: 12px 15px; text-align: right; color: #4a5568;">71.8%</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 12px 15px; padding-left: 30px; color: #4a5568;">&nbsp;&nbsp;• 服務收入</td>
+                                    <td style="padding: 12px 15px; text-align: right; color: #4a5568;">$ 350,600</td>
+                                    <td style="padding: 12px 15px; text-align: right; color: #4a5568;">28.2%</td>
+                                </tr>
+                                <tr style="border-bottom: 2px solid #e2e8f0; background-color: #f8fafc;">
+                                    <td style="padding: 12px 15px; font-weight: bold; color: #2d3748;">營業成本</td>
+                                    <td style="padding: 12px 15px; text-align: right; font-weight: bold; color: #d69e2e;">${cost}</td>
+                                    <td style="padding: 12px 15px; text-align: right; color: #d69e2e;">${costPercentage}%</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 12px 15px; padding-left: 30px; color: #4a5568;">&nbsp;&nbsp;• 原材料成本</td>
+                                    <td style="padding: 12px 15px; text-align: right; color: #4a5568;">$ 512,800</td>
+                                    <td style="padding: 12px 15px; text-align: right; color: #4a5568;">41.2%</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 12px 15px; padding-left: 30px; color: #4a5568;">&nbsp;&nbsp;• 人力成本</td>
+                                    <td style="padding: 12px 15px; text-align: right; color: #4a5568;">$ 245,300</td>
+                                    <td style="padding: 12px 15px; text-align: right; color: #4a5568;">19.7%</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 12px 15px; padding-left: 30px; color: #4a5568;">&nbsp;&nbsp;• 營運費用</td>
+                                    <td style="padding: 12px 15px; text-align: right; color: #4a5568;">$ 134,300</td>
+                                    <td style="padding: 12px 15px; text-align: right; color: #4a5568;">10.8%</td>
+                                </tr>
+                                <tr style="border-bottom: 2px solid #2c5282; background-color: #ebf8ff;">
+                                    <td style="padding: 12px 15px; font-weight: bold; color: #2c5282;">營業利潤</td>
+                                    <td style="padding: 12px 15px; text-align: right; font-weight: bold; color: #2c5282;">${profit}</td>
+                                    <td style="padding: 12px 15px; text-align: right; font-weight: bold; color: #2c5282;">${profitPercentage}%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 財務比率分析 -->
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #2c5282; font-size: 20px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #2c5282;">財務比率分析</h3>
+                        
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                                    <th style="text-align: left; padding: 10px 15px; font-weight: bold; color: #4a5568;">財務指標</th>
+                                    <th style="text-align: right; padding: 10px 15px; font-weight: bold; color: #4a5568;">數值</th>
+                                    <th style="text-align: left; padding: 10px 15px; font-weight: bold; color: #4a5568;">分析</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 10px 15px; color: #4a5568;">毛利率</td>
+                                    <td style="padding: 10px 15px; text-align: right; color: #4a5568;">${grossMargin}%</td>
+                                    <td style="padding: 10px 15px; color: #4a5568;">高於行業平均(62.3%)，顯示良好成本控制</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 10px 15px; color: #4a5568;">淨利率</td>
+                                    <td style="padding: 10px 15px; text-align: right; color: #4a5568;">${profitPercentage}%</td>
+                                    <td style="padding: 10px 15px; color: #4a5568;">優於行業平均(18.5%)，盈利能力強</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 10px 15px; color: #4a5568;">成本收入比</td>
+                                    <td style="padding: 10px 15px; text-align: right; color: #4a5568;">${costPercentage}%</td>
+                                    <td style="padding: 10px 15px; color: #4a5568;">成本控制良好，低於行業平均(75.2%)</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 10px 15px; color: #4a5568;">營運利潤率</td>
+                                    <td style="padding: 10px 15px; text-align: right; color: #4a5568;">${margin}</td>
+                                    <td style="padding: 10px 15px; color: #4a5568;">營運效率良好，持續改善</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 現金流分析 -->
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #2c5282; font-size: 20px; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #2c5282;">現金流分析</h3>
+                        
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                                    <th style="text-align: left; padding: 10px 15px; font-weight: bold; color: #4a5568;">現金流項目</th>
+                                    <th style="text-align: right; padding: 10px 15px; font-weight: bold; color: #4a5568;">金額</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 10px 15px; color: #4a5568;">營業活動現金流入</td>
+                                    <td style="padding: 10px 15px; text-align: right; color: #38a169;">$ 385,200</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 10px 15px; color: #4a5568;">投資活動現金流出</td>
+                                    <td style="padding: 10px 15px; text-align: right; color: #d69e2e;">$ 125,800</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 10px 15px; color: #4a5568;">融資活動現金流入</td>
+                                    <td style="padding: 10px 15px; text-align: right; color: #2c5282;">$ 50,000</td>
+                                </tr>
+                                <tr style="border-bottom: 2px solid #2c5282;">
+                                    <td style="padding: 10px 15px; font-weight: bold; color: #2c5282;">淨現金流</td>
+                                    <td style="padding: 10px 15px; text-align: right; font-weight: bold; color: #2c5282;">$ 309,400</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 財務總結 -->
+                    <div style="margin-bottom: 30px; padding: 20px; background-color: #f8fafc; border-radius: 8px; border-left: 4px solid #2c5282;">
+                        <h4 style="color: #2c5282; font-size: 18px; margin-bottom: 10px;">財務總結</h4>
+                        <p style="color: #4a5568; line-height: 1.6;">
+                            本期財務表現穩健，收入持續增長，成本控制得當，利潤率維持在健康水平。
+                            現金流充足，財務結構穩健，具備良好的償債能力和營運效率。
+                            建議繼續優化成本結構，擴大高利潤產品線，並加強應收賬款管理。
+                        </p>
+                    </div>
+                    
+                    <!-- 頁尾 -->
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; color: #718096; font-size: 12px;">
+                        <p>茶言觀色有限公司 • 統一編號: 12345678 • 財務報表編號: FIN-${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}</p>
+                        <p>本報表依據企業會計準則編製 • 頁次: 1/1 • 製表人: 財務部門</p>
+                    </div>
+                `;
+                
+                // 生成PDF
+                const options = {
+                    margin: [15, 15, 15, 15],
+                    filename: `茶言觀色_財務報表_${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false
+                    },
+                    jsPDF: {
+                        unit: 'mm',
+                        format: 'a4',
+                        orientation: 'portrait'
+                    }
+                };
+                
+                html2pdf().set(options).from(element).save().then(() => {
+                    resultDiv.innerHTML = '<p style="color: green;">✓ 專業財務報表PDF匯出成功！請檢查下載文件。</p>';
+                }).catch(error => {
+                    resultDiv.innerHTML = `<p style="color: red;">✗ PDF匯出失敗: ${error.message}</p>`;
+                    console.error('PDF匯出錯誤:', error);
+                });
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">✗ 發生錯誤: ${error.message}</p>`;
+                console.error('錯誤:', error);
+            }
+        });
+    </script>
+</body>
+</html>
