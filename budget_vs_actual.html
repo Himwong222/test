@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>預算規劃與實際支出比較</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        :root {
+            --primary: #6b8f24;
+            --primary-light: #8ab446;
+            --primary-dark: #4a6c1a;
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+    <!-- Navigation Header -->
+    <header class="flex items-center justify-between border-b border-primary/10 bg-white px-6 py-3 sticky top-0">
+        <div class="flex items-center gap-4 text-primary">
+            <span class="material-symbols-outlined text-3xl">monitoring</span>
+            <div>
+                <h1 class="text-xl font-bold">茶言觀色</h1>
+                <p class="text-xs opacity-75">預算規劃與比較</p>
+            </div>
+        </div>
+        <nav class="hidden md:flex items-center gap-6">
+            <a href="index.html" class="text-gray-600 hover:text-primary">首頁</a>
+            <a href="customer_list.html" class="text-gray-600 hover:text-primary">客戶列表</a>
+            <a href="reports.html" class="text-gray-600 hover:text-primary">數據報表</a>
+            <a href="financial_dashboard.html" class="text-gray-600 hover:text-primary">財務儀表板</a>
+            <a href="budget_vs_actual.html" class="text-primary font-semibold border-b-2 border-primary">預算規劃</a>
+            <a href="settings.html" class="text-gray-600 hover:text-primary">系統設定</a>
+        </nav>
+    </header>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">預算規劃與實際支出比較</h1>
+            <p class="text-gray-600">比較預算規劃與實際支出，分析差異並優化財務管理</p>
+        </div>
+
+        <!-- 預算規劃表單 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">預算規劃</h2>
+                <form id="budget-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">預算項目</label>
+                        <input type="text" id="budget-item" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="例如：行銷費用、人事成本等" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">預算金額</label>
+                            <input type="number" id="budget-amount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0" min="0" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">月份</label>
+                            <select id="budget-month" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="1">1月</option>
+                                <option value="2">2月</option>
+                                <option value="3">3月</option>
+                                <option value="4">4月</option>
+                                <option value="5">5月</option>
+                                <option value="6">6月</option>
+                                <option value="7">7月</option>
+                                <option value="8">8月</option>
+                                <option value="9">9月</option>
+                                <option value="10">10月</option>
+                                <option value="11">11月</option>
+                                <option value="12">12月</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">預算類別</label>
+                        <select id="budget-category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="marketing">行銷費用</option>
+                            <option value="personnel">人事成本</option>
+                            <option value="operations">營運費用</option>
+                            <option value="equipment">設備投資</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">add</span>
+                        添加預算項目
+                    </button>
+                </form>
+            </div>
+
+            <!-- 實際支出輸入 -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">實際支出記錄</h2>
+                <form id="actual-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">支出項目</label>
+                        <select id="actual-budget-item" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="">選擇預算項目</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">實際支出金額</label>
+                            <input type="number" id="actual-amount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0" min="0" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">支出日期</label>
+                            <input type="date" id="actual-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">備註</label>
+                        <textarea id="actual-notes" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" rows="2" placeholder="支出說明..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">payments</span>
+                        記錄實際支出
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 比較分析 -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-6">預算 vs 實際比較分析</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-green-50 border border-green-200 rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-green-800">預算總額</h3>
+                        <span class="material-symbols-outlined text-green-600">account_balance</span>
+                    </div>
+                    <p class="text-3xl font-bold text-green-900" id="total-budget">$ 0</p>
+                    <p class="text-sm text-green-700 mt-2">已規劃預算項目</p>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-blue-800">實際支出</h3>
+                        <span class="material-symbols-outlined text-blue-600">trending_up</span>
+                    </div>
+                    <p class="text-3xl font-bold text-blue-900" id="total-actual">$ 0</p>
+                    <p class="text-sm text-blue-700 mt-2">已記錄支出金額</p>
+                </div>
+                
+                <div class="bg-purple-50 border border-purple-200 rounded-xl p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-purple-800">差異分析</h3>
+                        <span class="material-symbols-outlined text-purple-600">analytics</span>
+                    </div>
+                    <p class="text-3xl font-bold text-purple-900" id="total-difference">$ 0</p>
+                    <p class="text-sm text-purple-700 mt-2">預算 - 實際</p>
+                </div>
+            </div>
+
+            <!-- 圖表 -->
+            <div class="mb-8">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">預算與實際支出比較圖</h3>
+                <div class="h-80">
+                    <canvas id="comparison-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- 詳細比較表 -->
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 mb-4">詳細比較表</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b border-gray-200">
+                                <th class="text-left py-3 px-4 font-bold text-gray-700">預算項目</th>
+                                <th class="text-left py-3 px-4 font-bold text-gray-700">預算金額</th>
+                                <th class="text-left py-3 px-4 font-bold text-gray-700">實際支出</th>
+                                <th class="text-left py-3 px-4 font-bold text-gray-700">差異</th>
+                                <th class="text-left py-3 px-4 font-bold text-gray-700">差異率</th>
+                                <th class="text-left py-3 px-4 font-bold text-gray-700">狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparison-table">
+                            <tr>
+                                <td colspan="6" class="py-8 text-center text-gray-500">
+                                    尚未添加預算項目與實際支出記錄
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化數據
+        let budgetData = [];
+        let actualData = [];
+        let comparisonChart = null;
+
+        // 初始化日期為今天
+        document.getElementById('actual-date').valueAsDate = new Date();
+
+        // 預算表單提交
+        document.getElementById('budget-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const item = document.getElementById('budget-item').value;
+            const amount = parseFloat(document.getElementById('budget-amount').value);
+            const month = document.getElementById('budget-month').value;
+            const category = document.getElementById('budget-category').value;
+            
+            if (!item || !amount) {
+                alert('請填寫所有必填欄位');
+                return;
+            }
+            
+            const budgetItem = {
+                id: Date.now(),
+                item: item,
+                amount: amount,
+                month: month,
+                category: category,
+                actualSpent: 0,
+                createdAt: new Date().toISOString()
+            };
+            
+            budgetData.push(budgetItem);
+            updateAndSave();
+            
+            // 重置表單
+            document.getElementById('budget-item').value = '';
+            document.getElementById('budget-amount').value = '';
+            
+            alert('預算項目添加成功！');
+        });
+
+        // 實際支出表單提交
+        document.getElementById('actual-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const budgetItemId = document.getElementById('actual-budget-item').value;
+            const amount = parseFloat(document.getElementById('actual-amount').value);
+            const date = document.getElementById('actual-date').value;
+            const notes = document.getElementById('actual-notes').value;
+            
+            if (!budgetItemId || !amount || !date) {
+                alert('請填寫所有必填欄位');
+                return;
+            }
+            
+            const budgetItem = budgetData.find(item => item.id == budgetItemId);
+            if (!budgetItem) {
+                alert('找不到對應的預算項目');
+                return;
+            }
+            
+            // 更新實際支出
+            budgetItem.actualSpent += amount;
+            
+            // 記錄詳細支出
+            actualData.push({
+                id: Date.now(),
+                budgetItemId: budgetItemId,
+                amount: amount,
+                date: date,
+                notes: notes,
+                createdAt: new Date().toISOString()
+            });
+            
+            updateAndSave();
+            
+            // 重置表單
+            document.getElementById('actual-amount').value = '';
+            document.getElementById('actual-notes').value = '';
+            
+            alert('實際支出記錄成功！');
+        });
+
+        // 更新預算選擇下拉框
+        function updateBudgetSelect() {
+            const select = document.getElementById('actual-budget-item');
+            select.innerHTML = '<option value="">選擇預算項目</option>';
+            
+            budgetData.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = `${item.item} (預算: $${item.amount.toLocaleString()})`;
+                select.appendChild(option);
+            });
+        }
+
+        // 更新比較表
+        function updateComparisonTable() {
+            const tableBody = document.getElementById('comparison-table');
+            
+            if (budgetData.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-gray-500">
+                            尚未添加預算項目與實際支出記錄
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let tableHTML = '';
+            
+            budgetData.forEach(item => {
+                const difference = item.amount - item.actualSpent;
+                const differenceRate = item.amount > 0 ? ((difference / item.amount) * 100).toFixed(1) : 0;
+                
+                let status = '';
+                let statusColor = '';
+                
+                if (difference > 0) {
+                    status = '預算剩餘';
+                    statusColor = 'text-green-600 bg-green-50';
+                } else if (difference < 0) {
+                    status = '超支';
+                    statusColor = 'text-red-600 bg-red-50';
+                } else {
+                    status = '符合預算';
+                    statusColor = 'text-blue-600 bg-blue-50';
+                }
+                
+                tableHTML += `
+                    <tr class="border-b border-gray-100 hover:bg-gray-50">
+                        <td class="py-3 px-4">${item.item}</td>
+                        <td class="py-3 px-4">$ ${item.amount.toLocaleString()}</td>
+                        <td class="py-3 px-4">$ ${item.actualSpent.toLocaleString()}</td>
+                        <td class="py-3 px-4 ${difference >= 0 ? 'text-green-600' : 'text-red-600'}">
+                            $ ${Math.abs(difference).toLocaleString()} ${difference >= 0 ? '(剩餘)' : '(超支)'}
+                        </td>
+                        <td class="py-3 px-4">${differenceRate}%</td>
+                        <td class="py-3 px-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-medium ${statusColor}">
+                                ${status}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = tableHTML;
+        }
+
+        // 更新摘要
+        function updateSummary() {
+            const totalBudget = budgetData.reduce((sum, item) => sum + item.amount, 0);
+            const totalActual = budgetData.reduce((sum, item) => sum + item.actualSpent, 0);
+            const totalDifference = totalBudget - totalActual;
+            
+            document.getElementById('total-budget').textContent = `$ ${totalBudget.toLocaleString()}`;
+            document.getElementById('total-actual').textContent = `$ ${totalActual.toLocaleString()}`;
+            document.getElementById('total-difference').textContent = `$ ${totalDifference.toLocaleString()}`;
+            
+            // 更新差異顏色
+            const differenceElement = document.getElementById('total-difference');
+            if (totalDifference >= 0) {
+                differenceElement.className = 'text-3xl font-bold text-green-900';
+            } else {
+                differenceElement.className = 'text-3xl font-bold text-red-900';
+            }
+        }
+
+        // 更新圖表
+        function updateChart() {
+            const ctx = document.getElementById('comparison-chart').getContext('2d');
+            
+            if (comparisonChart) {
+                comparisonChart.destroy();
+            }
+            
+            const labels = budgetData.map(item => item.item);
+            const budgetAmounts = budgetData.map(item => item.amount);
+            const actualAmounts = budgetData.map(item => item.actualSpent);
+            
+            comparisonChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: '預算金額',
+                            data: budgetAmounts,
+                            backgroundColor: '#6b8f24',
+                            borderColor: '#4a6c1a',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '實際支出',
+                            data: actualAmounts,
+                            backgroundColor: '#3b82f6',
+                            borderColor: '#1d4ed8',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$ ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += '$ ' + context.parsed.y.toLocaleString();
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 保存數據到localStorage
+        function saveData() {
+            localStorage.setItem('budgetData', JSON.stringify(budgetData));
+            localStorage.setItem('actualData', JSON.stringify(actualData));
+        }
+
+        // 從localStorage載入數據
+        function loadData() {
+            const savedBudgetData = localStorage.getItem('budgetData');
+            const savedActualData = localStorage.getItem('actualData');
+            
+            if (savedBudgetData) {
+                budgetData = JSON.parse(savedBudgetData);
+            } else {
+                // 如果沒有保存的數據，添加一些示例預算項目
+                budgetData = [
+                    {
+                        id: 1,
+                        item: '行銷費用',
+                        amount: 50000,
+                        month: '2024-01',
+                        category: '市場營銷',
+                        actualSpent: 0,
+                        createdAt: '2024-01-01T00:00:00.000Z'
+                    },
+                    {
+                        id: 2,
+                        item: '人事成本',
+                        amount: 200000,
+                        month: '2024-01',
+                        category: '人力資源',
+                        actualSpent: 0,
+                        createdAt: '2024-01-01T00:00:00.000Z'
+                    },
+                    {
+                        id: 3,
+                        item: '辦公室租金',
+                        amount: 80000,
+                        month: '2024-01',
+                        category: '行政費用',
+                        actualSpent: 0,
+                        createdAt: '2024-01-01T00:00:00.000Z'
+                    },
+                    {
+                        id: 4,
+                        item: '設備採購',
+                        amount: 30000,
+                        month: '2024-01',
+                        category: '資產投資',
+                        actualSpent: 0,
+                        createdAt: '2024-01-01T00:00:00.000Z'
+                    }
+                ];
+            }
+            
+            if (savedActualData) {
+                actualData = JSON.parse(savedActualData);
+            } else {
+                actualData = [];
+            }
+        }
+
+        // 更新數據時保存
+        function updateAndSave() {
+            updateBudgetSelect();
+            updateComparisonTable();
+            updateSummary();
+            updateChart();
+            saveData();
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            updateAndSave();
+        });
+    </script>
+</body>
+</html>

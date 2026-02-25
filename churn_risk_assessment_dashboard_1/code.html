@@ -214,11 +214,33 @@
 <!-- Action Recommendations -->
 <div class="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-primary/5">
 <div class="flex items-center gap-3 mb-8">
-<div class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-<span class="material-symbols-outlined">lightbulb</span>
+    <div class="size-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+        <span class="material-symbols-outlined">lightbulb</span>
+    </div>
+    <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100">Retention Strategy</h3>
 </div>
-<h3 class="text-xl font-bold text-slate-900 dark:text-slate-100">Retention Strategy</h3>
+
+<!-- Retention Decision Recommendation -->
+<div id="retention-decision" class="mb-8 p-6 rounded-xl border border-slate-200 dark:border-slate-700 bg-gradient-to-r from-primary/5 to-primary/10">
+    <div class="flex items-start gap-4">
+        <div class="size-12 rounded-full bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-[24px]">decision</span>
+        </div>
+        <div class="flex-1">
+            <h4 class="font-bold text-lg text-slate-900 dark:text-slate-100 mb-2">客戶保留建議</h4>
+            <p id="retention-decision-text" class="text-slate-700 dark:text-slate-300">
+                根據流失風險評估，系統將提供是否應該保留此客戶的建議。
+            </p>
+            <div id="retention-reason" class="mt-3 text-sm text-slate-600 dark:text-slate-400">
+                <!-- Reasons will be populated by JavaScript -->
+            </div>
+        </div>
+        <div id="retention-badge" class="px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-sm font-medium">
+            等待評估
+        </div>
+    </div>
 </div>
+
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 <!-- Recommendation 1 -->
 <div class="p-5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 hover:border-primary/40 transition-all cursor-pointer group">
@@ -497,6 +519,131 @@
             
             description += factors.slice(0, 3).join('<br/>');
             document.getElementById('risk-description').innerHTML = description;
+            
+            // Update retention decision recommendation
+            updateRetentionDecision(results, age, visits, days, satisfaction);
+        }
+        
+        // Update retention decision based on churn risk
+        function updateRetentionDecision(results, age, visits, days, satisfaction) {
+            const decisionElement = document.getElementById('retention-decision-text');
+            const reasonElement = document.getElementById('retention-reason');
+            const badgeElement = document.getElementById('retention-badge');
+            
+            let decision = '';
+            let reason = '';
+            let badgeText = '';
+            let badgeColor = '';
+            
+            // Decision logic based on churn probability
+            if (results.probability >= 60) {
+                // High risk: Consider letting go or aggressive retention
+                decision = '建議：考慮放棄或採取積極保留措施';
+                badgeText = '高風險客戶';
+                badgeColor = 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-900/30 dark:text-rose-300 dark:border-rose-700';
+                
+                reason = `
+                    <div class="space-y-2">
+                        <p class="font-medium">原因分析：</p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>流失機率高達 ${results.probability}%，超過警戒線</li>
+                            <li>保留成本可能高於客戶終身價值</li>
+                            <li>建議優先處理其他中低風險客戶</li>
+                        </ul>
+                        <p class="mt-2 font-medium">行動建議：</p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>若客戶價值高，可嘗試最後一次優惠挽留</li>
+                            <li>否則建議資源重新分配至更有價值客戶</li>
+                            <li>記錄流失原因供未來產品改進參考</li>
+                        </ul>
+                    </div>
+                `;
+            } else if (results.probability >= 40) {
+                // Medium risk: Worth retaining with targeted efforts
+                decision = '建議：值得保留，需採取針對性措施';
+                badgeText = '中等風險客戶';
+                badgeColor = 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700';
+                
+                reason = `
+                    <div class="space-y-2">
+                        <p class="font-medium">原因分析：</p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>流失機率為 ${results.probability}%，處於中等風險範圍</li>
+                            <li>客戶仍有相當價值，值得投入資源保留</li>
+                            <li>關鍵因素：${getKeyRiskFactors(days, satisfaction, visits)}</li>
+                        </ul>
+                        <p class="mt-2 font-medium">行動建議：</p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>實施右側建議的保留策略</li>
+                            <li>定期追蹤改善情況（建議每2週一次）</li>
+                            <li>考慮提供個性化優惠或服務</li>
+                        </ul>
+                    </div>
+                `;
+            } else {
+                // Low risk: Definitely retain
+                decision = '建議：強烈建議保留，維持良好關係';
+                badgeText = '低風險客戶';
+                badgeColor = 'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-700';
+                
+                reason = `
+                    <div class="space-y-2">
+                        <p class="font-medium">原因分析：</p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>流失機率僅 ${results.probability}%，屬於低風險客戶</li>
+                            <li>客戶忠誠度高，具有長期價值</li>
+                            <li>關鍵優勢：${getKeyPositiveFactors(days, satisfaction, visits)}</li>
+                        </ul>
+                        <p class="mt-2 font-medium">行動建議：</p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>維持現有服務品質，避免過度打擾</li>
+                            <li>考慮升級為VIP客戶或提供忠誠度獎勵</li>
+                            <li>定期收集反饋以進一步提升滿意度</li>
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            // Update decision text
+            decisionElement.textContent = decision;
+            
+            // Update reason HTML
+            reasonElement.innerHTML = reason;
+            
+            // Update badge
+            badgeElement.textContent = badgeText;
+            badgeElement.className = `px-4 py-2 rounded-full border text-sm font-medium ${badgeColor}`;
+            
+            // Update decision card background based on risk level
+            const decisionCard = document.getElementById('retention-decision');
+            if (results.probability >= 60) {
+                decisionCard.className = 'mb-8 p-6 rounded-xl border border-rose-200 dark:border-rose-800 bg-gradient-to-r from-rose-50 to-rose-100 dark:from-rose-900/20 dark:to-rose-800/20';
+            } else if (results.probability >= 40) {
+                decisionCard.className = 'mb-8 p-6 rounded-xl border border-amber-200 dark:border-amber-800 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20';
+            } else {
+                decisionCard.className = 'mb-8 p-6 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20';
+            }
+        }
+        
+        // Helper function to get key risk factors
+        function getKeyRiskFactors(days, satisfaction, visits) {
+            const factors = [];
+            if (days > 60) factors.push('長時間未訪問');
+            if (days >= 30 && days <= 60) factors.push('中等時間未訪問');
+            if (satisfaction <= 2) factors.push('低滿意度');
+            if (satisfaction === 3) factors.push('中等滿意度');
+            if (visits <= 3) factors.push('低訪問頻率');
+            if (visits >= 4 && visits <= 6) factors.push('中等訪問頻率');
+            return factors.slice(0, 2).join('、');
+        }
+        
+        // Helper function to get key positive factors
+        function getKeyPositiveFactors(days, satisfaction, visits) {
+            const factors = [];
+            if (days <= 30) factors.push('近期有訪問');
+            if (satisfaction >= 4) factors.push('高滿意度');
+            if (visits > 6) factors.push('高訪問頻率');
+            return factors.length > 0 ? factors.join('、') : '穩定的客戶行為';
         }
         
         // Handle assess button click
